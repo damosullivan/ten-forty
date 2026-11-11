@@ -6,6 +6,10 @@
 #define ROWS 3
 #define MARGIN_X 6
 #define ANIM_FRAME_MS 40
+/* Ink clearance from the screen edge for the date row. The top value is a box
+ * offset that lands the glyphs about 4px in; the bottom is the gap below. */
+#define DATE_EDGE_TOP 3
+#define DATE_EDGE_BOTTOM 5
 
 /* ------------------------------------------------------------------- fonts
  * Sizes are picked per screen so each platform fills its width the same way.
@@ -133,9 +137,9 @@ static int16_t row_baseline(int i) {
    * screen: a date at the bottom pushes them up, one at the top pushes them
    * down, and with no date they get the full height. */
   if (app->datepos == 1) {
-    anchor += (int16_t)((1 + app->h_date) / 2);
+    anchor += (int16_t)((DATE_EDGE_TOP + app->h_date) / 2);
   } else if (app->datepos == 2) {
-    int16_t dtop = (int16_t)(b.size.h - app->h_date - 2);
+    int16_t dtop = (int16_t)(b.size.h - app->h_date - DATE_EDGE_BOTTOM);
     anchor -= (int16_t)((b.size.h - dtop) / 2);
   }
 
@@ -144,7 +148,9 @@ static int16_t row_baseline(int i) {
 
 static int16_t date_y(void) {
   GRect b = visible_bounds();
-  return (app->datepos == 1) ? 1 : (int16_t)(b.size.h - app->h_date - 2);
+  return (app->datepos == 1)
+      ? DATE_EDGE_TOP
+      : (int16_t)(b.size.h - app->h_date - DATE_EDGE_BOTTOM);
 }
 
 /* ------------------------------------------------------------------ drawing */
