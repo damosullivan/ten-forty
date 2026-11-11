@@ -94,8 +94,21 @@ function buildConfigHtml() {
          '<script>' + js + '<\/script></body></html>';
 }
 
-Pebble.addEventListener('ready', function () {
-  sendOpts(loadOpts());
+/* The watch is the source of truth. It pushes its settings on launch and we
+ * mirror them here, so the config page always opens on the real values. The
+ * phone must not push settings on startup: that used to overwrite whatever the
+ * watch had, which made the face appear to change on its own. */
+Pebble.addEventListener('appmessage', function (e) {
+  var payload = e.payload || {};
+  var opts = loadOpts();
+  var changed = false;
+  for (var k in opts) {
+    if (payload[k] !== undefined && payload[k] !== opts[k]) {
+      opts[k] = payload[k];
+      changed = true;
+    }
+  }
+  if (changed) saveOpts(opts);
 });
 
 Pebble.addEventListener('showConfiguration', function () {

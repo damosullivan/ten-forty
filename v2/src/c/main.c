@@ -358,12 +358,6 @@ static void apply_weight(void) {
   layer_mark_dirty(app->canvas);
 }
 
-static void tap_handler(AccelAxisType axis, int32_t direction) {
-  app->theme ^= 1;
-  persist_write_int(1, app->theme);
-  apply_theme();
-}
-
 static void inbox_received(DictionaryIterator *it, void *context) {
   Tuple *t;
   bool dirty = false;
@@ -429,6 +423,25 @@ static void inbox_received(DictionaryIterator *it, void *context) {
     layer_mark_dirty(app->canvas);
     start_animation();
   }
+}
+
+/* The watch owns the settings. It tells the phone what they are on launch, so
+ * the config page opens showing the truth rather than whatever the phone last
+ * remembered. */
+static void send_settings_to_phone(void) {
+  DictionaryIterator *iter;
+  if (app_message_outbox_begin(&iter) != APP_MSG_OK) {
+    return;
+  }
+  dict_write_int8(iter, MESSAGE_KEY_Theme, (int8_t)app->theme);
+  dict_write_int8(iter, MESSAGE_KEY_Align, (int8_t)app->align);
+  dict_write_int8(iter, MESSAGE_KEY_DateAlign, (int8_t)app->datealign);
+  dict_write_int8(iter, MESSAGE_KEY_DatePos, (int8_t)app->datepos);
+  dict_write_int8(iter, MESSAGE_KEY_OhWords, (int8_t)app->oh);
+  dict_write_int8(iter, MESSAGE_KEY_Weight, (int8_t)app->regular);
+  dict_write_int8(iter, MESSAGE_KEY_Case, (int8_t)app->caps);
+  dict_write_int8(iter, MESSAGE_KEY_Transition, (int8_t)app->trans);
+  app_message_outbox_send();
 }
 
 static void inbox_dropped(AppMessageResult reason, void *context) {
@@ -504,13 +517,14 @@ static void init(void) {
   unobstructed_area_service_subscribe((UnobstructedAreaHandlers){
     .change = unobstructed_change,
   }, NULL);
-  accel_tap_service_subscribe(tap_handler);
 
   app_message_register_inbox_received(inbox_received);
   app_message_register_inbox_dropped(inbox_dropped);
   app_message_open(128, 128);
 
   window_stack_push(app->window, true);
+
+  send_settings_to_phone();
 
   time_t now = time(NULL);
   struct tm tm_now = *localtime(&now);
@@ -527,7 +541,6 @@ static void deinit(void) {
 
   tick_timer_service_unsubscribe();
   unobstructed_area_service_unsubscribe();
-  accel_tap_service_unsubscribe();
 
   window_destroy(app->window);
 

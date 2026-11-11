@@ -48,7 +48,9 @@ Case is applied to all three rows together, and to the date. It is one
 setting by design: the rows are a single sentence split across lines, and the
 hour is already distinguished by weight and size.
 
-Tapping the watch also toggles light/dark.
+The watch owns the settings. It persists them and pushes them to the phone on
+launch, so the config page opens showing the real values. The phone never
+pushes on startup -- only when you press Save.
 
 ## Tests
 
