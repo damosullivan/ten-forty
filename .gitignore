@@ -1,0 +1,19 @@
+# Build output
+v2/build/
+build/
+
+# Upstream reference clone (keeps its own git history; see README for the URL)
+baseline/
+
+# Scratch from the design process: candidate fonts and screenshots that were
+# compared but not shipped. Project screenshots live in v2/screenshots/.
+fonts-src/
+shots/
+
+# waf build lock
+.lock-waf*
+v2/.lock-waf*
+
+# Fonts are fetched, not committed: three Iosevka weights are 24 MB.
+# Run v2/scripts/fetch-fonts.sh after cloning.
+v2/resources/fonts/font-*.ttf

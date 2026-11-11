@@ -1,0 +1,249 @@
+{
+  "name": "sliding-time-v2",
+  "author": "Damien",
+  "version": "0.1.0",
+  "private": true,
+  "keywords": [
+    "pebble-app"
+  ],
+  "dependencies": {},
+  "pebble": {
+    "displayName": "Sliding Time v2",
+    "uuid": "6f1c2b40-8a3d-4e57-9c21-7b5e0d4a9f13",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "basalt",
+      "flint",
+      "chalk",
+      "emery",
+      "gabbro"
+    ],
+    "capabilities": [
+      "configurable"
+    ],
+    "watchapp": {
+      "watchface": true
+    },
+    "messageKeys": [
+      "Align",
+      "Case",
+      "DateAlign",
+      "DatePos",
+      "OhWords",
+      "Theme",
+      "Transition",
+      "Weight"
+    ],
+    "resources": {
+      "media": [
+        {
+          "type": "font",
+          "name": "FONT_HOUR_44",
+          "file": "fonts/font-bold.ttf",
+          "pixelHeight": 44,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "basalt",
+            "flint"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_MIN_LIGHT_37",
+          "file": "fonts/font-light.ttf",
+          "pixelHeight": 37,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "basalt",
+            "flint"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_MIN_REG_37",
+          "file": "fonts/font-regular.ttf",
+          "pixelHeight": 37,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "basalt",
+            "flint"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_DATE_LIGHT_16",
+          "file": "fonts/font-light.ttf",
+          "pixelHeight": 16,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "basalt",
+            "flint"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_DATE_REG_16",
+          "file": "fonts/font-regular.ttf",
+          "pixelHeight": 16,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "basalt",
+            "flint"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_HOUR_48",
+          "file": "fonts/font-bold.ttf",
+          "pixelHeight": 48,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "chalk"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_MIN_LIGHT_40",
+          "file": "fonts/font-light.ttf",
+          "pixelHeight": 40,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "chalk"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_MIN_REG_40",
+          "file": "fonts/font-regular.ttf",
+          "pixelHeight": 40,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "chalk"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_DATE_LIGHT_17",
+          "file": "fonts/font-light.ttf",
+          "pixelHeight": 17,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "chalk"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_DATE_REG_17",
+          "file": "fonts/font-regular.ttf",
+          "pixelHeight": 17,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "chalk"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_HOUR_61",
+          "file": "fonts/font-bold.ttf",
+          "pixelHeight": 61,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "emery"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_MIN_LIGHT_51",
+          "file": "fonts/font-light.ttf",
+          "pixelHeight": 51,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "emery"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_MIN_REG_51",
+          "file": "fonts/font-regular.ttf",
+          "pixelHeight": 51,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "emery"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_DATE_LIGHT_22",
+          "file": "fonts/font-light.ttf",
+          "pixelHeight": 22,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "emery"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_DATE_REG_22",
+          "file": "fonts/font-regular.ttf",
+          "pixelHeight": 22,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "emery"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_HOUR_70",
+          "file": "fonts/font-bold.ttf",
+          "pixelHeight": 70,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "gabbro"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_MIN_LIGHT_59",
+          "file": "fonts/font-light.ttf",
+          "pixelHeight": 59,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "gabbro"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_MIN_REG_59",
+          "file": "fonts/font-regular.ttf",
+          "pixelHeight": 59,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "gabbro"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_DATE_LIGHT_26",
+          "file": "fonts/font-light.ttf",
+          "pixelHeight": 26,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "gabbro"
+          ]
+        },
+        {
+          "type": "font",
+          "name": "FONT_DATE_REG_26",
+          "file": "fonts/font-regular.ttf",
+          "pixelHeight": 26,
+          "characterRegex": "[0-9A-Za-z' \\-]",
+          "targetPlatforms": [
+            "gabbro"
+          ]
+        }
+      ]
+    }
+  },
+  "description": "A text clock for Pebble. Three stacked words set in Iosevka: the hour bold, the minutes light. Optional date, seven typographic settings, no clutter."
+}
