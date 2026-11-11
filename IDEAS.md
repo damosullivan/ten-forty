@@ -31,7 +31,8 @@ Deferred by decision, not by accident. Nothing here is started.
   ("seventy" -> "seventy one" moves just the tail). Calmer than re-sliding the
   whole word. This is what Mongo Time / Reel Time get right.
 - **Tunable duration / easing.** Current speed is `abs(x)/3 + 1` at 40ms per
-  frame, per-row delays 6/3/0.
+  frame. Rows move together; the old 6/3/0 stagger was removed in favour of
+  the hour-only slide.
 - **Entrance animation on wake.** Currently only on launch.
 
 ## Information

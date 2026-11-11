@@ -40,7 +40,6 @@
 typedef enum {
   MOVING_IN,
   IN_FRAME,
-  PREPARE_TO_MOVE,
   MOVING_OUT
 } SlideState;
 
@@ -49,8 +48,6 @@ typedef struct {
   char text[2][24];
   uint8_t buf;        /* which of the two strings is on screen */
   int16_t x;          /* horizontal offset, 0 == at rest */
-  int16_t delay;      /* frames to hold before sliding out */
-  int16_t delay_count;
   bool bold;
 } Row;
 
@@ -199,7 +196,6 @@ static void row_set_text(Row *r, const char *s, bool animate) {
     r->text[r->buf][sizeof(r->text[0]) - 1] = '\0';
     r->x = 0;
     r->state = IN_FRAME;
-    r->delay_count = 0;
     return;
   }
 
@@ -213,8 +209,7 @@ static void row_set_text(Row *r, const char *s, bool animate) {
     r->x = layer_get_bounds(app->canvas).size.w;
     r->state = MOVING_IN;
   } else {
-    r->state = PREPARE_TO_MOVE;
-    r->delay_count = 0;
+    r->state = MOVING_OUT;
   }
 }
 
@@ -222,13 +217,6 @@ static bool row_step(Row *r) {
   const int16_t w = layer_get_bounds(app->canvas).size.w;
 
   switch (r->state) {
-    case PREPARE_TO_MOVE:
-      if (++r->delay_count > r->delay) {
-        r->state = MOVING_OUT;
-        r->delay_count = 0;
-      }
-      return true;
-
     case MOVING_IN: {
       r->x -= abs16(r->x) / 3 + 1;
       if (r->x <= 0) {
@@ -244,7 +232,6 @@ static bool row_step(Row *r) {
         r->x = w;
         r->buf ^= 1;
         r->state = MOVING_IN;
-        r->delay_count = 0;
       }
       return true;
     }
@@ -503,7 +490,6 @@ static void init(void) {
 
   for (int i = 0; i < ROWS; i++) {
     app->rows[i].bold = (i == 0);
-    app->rows[i].delay = (int16_t)(6 - i * 3);
     app->rows[i].state = IN_FRAME;
   }
 
