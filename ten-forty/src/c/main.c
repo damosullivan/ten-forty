@@ -74,11 +74,6 @@ typedef struct {
   uint8_t regular;   /* 0 = Iosevka Light, 1 = Iosevka Regular */
   uint8_t caps;      /* 0 lower, 1 UPPER, 2 Capital */
   uint8_t trans;     /* 0 none, 1 slide every row, 2 slide the hour only */
-  uint8_t datehold;  /* seconds the date lingers after the face appears; 0 = always */
-  uint8_t tapdate;   /* 1 = a tap also reveals the date */
-  bool date_visible;
-  AppTimer *date_timer;
-
   char date_text[16];
 } App;
 
@@ -163,7 +158,7 @@ static void canvas_update(Layer *layer, GContext *ctx) {
                        GTextOverflowModeFill, to_alignment(app->align), NULL);
   }
 
-  if (app->datepos && app->date_visible && app->date_text[0]) {
+  if (app->datepos && app->date_text[0]) {
     GRect box = GRect(mx, date_y(), w, app->h_date);
 #if defined(PBL_ROUND)
     /* Keep the date inside the circle instead of clipping it in the corner. */
@@ -283,60 +278,6 @@ static char *to_case(char *s) {
   return s;
 }
 
-/* The date is drawn in the margin, never in reserved space, so showing and
- * hiding it cannot move the time. */
-static void hide_date(void *data) {
-  app->date_timer = NULL;
-  if (app->date_visible) {
-    app->date_visible = false;
-    layer_mark_dirty(app->canvas);
-  }
-}
-
-static void show_date(void) {
-  if (app->date_timer) {
-    app_timer_cancel(app->date_timer);
-    app->date_timer = NULL;
-  }
-  app->date_visible = true;
-  layer_mark_dirty(app->canvas);
-  if (app->datehold > 0) {
-    app->date_timer = app_timer_register((uint32_t)app->datehold * 1000,
-                                         hide_date, NULL);
-  }
-}
-
-/* A tap wakes the screen, and it is the only gesture a watchface receives:
- * buttons belong to the timeline, the launcher and the system. Revealing the
- * date is idempotent, so an accidental tap costs nothing. */
-static void tap_handler(AccelAxisType axis, int32_t direction) {
-  if (app->tapdate) {
-    show_date();
-  }
-}
-
-/* Only some platforms can see the backlight: emery, flint and gabbro. On
- * aplite, basalt, chalk and diorite the service is a compiled-out stub, so
- * this whole branch disappears. */
-#ifdef _PBL_API_EXISTS_backlight_service_subscribe
-static void backlight_handler(bool on) {
-  if (on) {
-    show_date();
-  }
-}
-#endif
-
-/* Coming back from an app is the moment someone orientates themselves, so
- * that is when the date earns its place. */
-static void focus_handler(bool in_focus) {
-  if (in_focus) {
-    show_date();
-  } else if (app->date_timer) {
-    app_timer_cancel(app->date_timer);
-    app->date_timer = NULL;
-  }
-}
-
 static void refresh_date(const struct tm *t) {
   static const char *const DAYS[] = {
     "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
@@ -446,17 +387,6 @@ static void inbox_received(DictionaryIterator *it, void *context) {
     persist_write_int(8, app->caps);
     dirty = true;
   }
-  if ((t = dict_find(it, MESSAGE_KEY_TapDate))) {
-    app->tapdate = t->value->int32 ? 1 : 0;
-    persist_write_int(11, app->tapdate);
-    dirty = true;
-  }
-  if ((t = dict_find(it, MESSAGE_KEY_DateHold))) {
-    app->datehold = (uint8_t)t->value->int32;
-    persist_write_int(10, app->datehold);
-    show_date();
-    dirty = true;
-  }
   if ((t = dict_find(it, MESSAGE_KEY_Transition))) {
     app->trans = (uint8_t)t->value->int32;
     persist_write_int(9, app->trans);
@@ -510,8 +440,6 @@ static void send_settings_to_phone(void) {
   dict_write_int8(iter, MESSAGE_KEY_Weight, (int8_t)app->regular);
   dict_write_int8(iter, MESSAGE_KEY_Case, (int8_t)app->caps);
   dict_write_int8(iter, MESSAGE_KEY_Transition, (int8_t)app->trans);
-  dict_write_int8(iter, MESSAGE_KEY_DateHold, (int8_t)app->datehold);
-  dict_write_int8(iter, MESSAGE_KEY_TapDate, (int8_t)app->tapdate);
   app_message_outbox_send();
 }
 
@@ -557,8 +485,6 @@ static void init(void) {
   app->regular   = persist_exists(7) ? persist_read_int(7) : 0;
   app->caps      = persist_exists(8) ? persist_read_int(8) : 0;
   app->trans     = persist_exists(9) ? persist_read_int(9) : 2;
-  app->datehold  = persist_exists(10) ? persist_read_int(10) : 0;
-  app->tapdate   = persist_exists(11) ? persist_read_int(11) : 0;
 
   app->last_hour = -1;
   app->last_minute = -1;
@@ -587,11 +513,6 @@ static void init(void) {
   });
 
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
-  app_focus_service_subscribe(focus_handler);
-  accel_tap_service_subscribe(tap_handler);
-#ifdef _PBL_API_EXISTS_backlight_service_subscribe
-  backlight_service_subscribe(backlight_handler);
-#endif
   unobstructed_area_service_subscribe((UnobstructedAreaHandlers){
     .change = unobstructed_change,
   }, NULL);
@@ -601,7 +522,6 @@ static void init(void) {
   app_message_open(128, 128);
 
   window_stack_push(app->window, true);
-  show_date();
 
   send_settings_to_phone();
 
@@ -618,18 +538,8 @@ static void deinit(void) {
     app->timer = NULL;
   }
 
-  if (app->date_timer) {
-    app_timer_cancel(app->date_timer);
-    app->date_timer = NULL;
-  }
-
   tick_timer_service_unsubscribe();
   unobstructed_area_service_unsubscribe();
-  app_focus_service_unsubscribe();
-  accel_tap_service_unsubscribe();
-#ifdef _PBL_API_EXISTS_backlight_service_subscribe
-  backlight_service_unsubscribe();
-#endif
 
   window_destroy(app->window);
 
