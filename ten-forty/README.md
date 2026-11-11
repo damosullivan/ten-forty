@@ -23,14 +23,15 @@ or by `pebble send-app-message --int <key>=<value>`.
 
 | Setting        | Id    | Values                                  | Default |
 |----------------|-------|-----------------------------------------|---------|
-| Theme          | 10005 | 0 white-on-black, 1 black-on-white      | 0       |
+| Theme          | 10006 | 0 white-on-black, 1 black-on-white      | 0       |
 | Time alignment | 10000 | 0 left, 1 centre, 2 right               | 0       |
 | Date alignment | 10002 | 0 left, 1 centre, 2 right               | 1       |
-| Date position  | 10003 | 0 hidden, 1 top, 2 bottom               | 2       |
-| `oh` minutes   | 10004 | 1 "seven oh five", 0 "seven five"       | 1       |
-| Font weight    | 10007 | 0 Light, 1 Regular                      | 0       |
+| Date position  | 10004 | 0 hidden, 1 top, 2 bottom               | 2       |
+| Date stays for | 10003 | 0 always, 5, 10 or 30 seconds           | 0       |
+| `oh` minutes   | 10005 | 1 "seven oh five", 0 "seven five"       | 1       |
+| Font weight    | 10008 | 0 Light, 1 Regular                      | 0       |
 | Letter case    | 10001 | 0 lowercase, 1 UPPERCASE, 2 Capital     | 0       |
-| Transition     | 10006 | 0 none, 1 slide every row, 2 hour only  | 2       |
+| Transition     | 10007 | 0 none, 1 slide every row, 2 hour only  | 2       |
 
 Ids are assigned alphabetically by the SDK, so adding a setting renumbers
 them. `build/js/message_keys.json` is the source of truth. For example:
@@ -38,6 +39,11 @@ them. `build/js/message_keys.json` is the source of truth. For example:
 ```sh
 pebble send-app-message --emulator basalt --int 10007=1   # Regular weight
 ```
+
+Date stays for **always** by default. Set it to 5, 10 or 30 seconds and the
+date appears when the face is focused — on launch, or when you come back from
+an app — then fades out. The date is drawn in the margin and never reserves
+space, so hiding it cannot move the time.
 
 Transition defaults to **slide the hour only**: the minute rows cut instantly,
 so the face is still almost all of the time, and the one change you would

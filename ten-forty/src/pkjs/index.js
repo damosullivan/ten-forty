@@ -7,7 +7,7 @@
 
 var CONFIG_URL = null; /* set to 'https://example.com/config.html' if hosted */
 
-var DEFAULT_OPTS = { Theme: 0, Align: 0, DateAlign: 1, DatePos: 2, OhWords: 1, Weight: 0, Case: 0, Transition: 2 };
+var DEFAULT_OPTS = { Theme: 0, Align: 0, DateAlign: 1, DatePos: 2, OhWords: 1, Weight: 0, Case: 0, Transition: 2, DateHold: 0 };
 
 function loadOpts() {
   try {
@@ -57,7 +57,8 @@ function buildConfigHtml() {
     ['OhWords', 'Single-digit minutes', [['1', 'Seven oh five'], ['0', 'Seven five']]],
     ['Weight', 'Font weight', [['0', 'Light'], ['1', 'Regular']]],
     ['Case', 'Letter case', [['0', 'lowercase'], ['1', 'UPPERCASE'], ['2', 'Capital']]],
-    ['Transition', 'Transition', [['2', 'Slide the hour only'], ['1', 'Slide every row'], ['0', 'No animation']]]
+    ['Transition', 'Transition', [['2', 'Slide the hour only'], ['1', 'Slide every row'], ['0', 'No animation']]],
+    ['DateHold', 'Date stays for', [['0', 'Always'], ['5', '5 seconds'], ['10', '10 seconds'], ['30', '30 seconds']]]
   ];
 
   var body = '';
@@ -73,13 +74,13 @@ function buildConfigHtml() {
   var js = [
     'var o=JSON.parse(decodeURIComponent((location.hash||location.search).slice(1))||"{}");',
     'var D=' + JSON.stringify(DEFAULT_OPTS) + ';',
-    '["Theme","Align","DateAlign","DatePos","OhWords","Weight","Case","Transition"].forEach(function(k){',
+    '["Theme","Align","DateAlign","DatePos","OhWords","Weight","Case","Transition","DateHold"].forEach(function(k){',
     '  var e=document.getElementById(k);',
     '  e.value=String(o[k]===undefined?D[k]:o[k]);',
     '});',
     'document.getElementById("save").addEventListener("click",function(){',
     '  var out={};',
-    '  ["Theme","Align","DateAlign","DatePos","OhWords","Weight","Case","Transition"].forEach(function(k){',
+    '  ["Theme","Align","DateAlign","DatePos","OhWords","Weight","Case","Transition","DateHold"].forEach(function(k){',
     '    out[k]=parseInt(document.getElementById(k).value,10);',
     '  });',
     '  document.location="pebblejs://close#"+encodeURIComponent(JSON.stringify(out));',
