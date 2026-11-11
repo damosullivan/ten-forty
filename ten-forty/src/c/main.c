@@ -75,6 +75,7 @@ typedef struct {
   uint8_t caps;      /* 0 lower, 1 UPPER, 2 Capital */
   uint8_t trans;     /* 0 none, 1 slide every row, 2 slide the hour only */
   uint8_t datehold;  /* seconds the date lingers after the face appears; 0 = always */
+  uint8_t tapdate;   /* 1 = a tap also reveals the date */
   bool date_visible;
   AppTimer *date_timer;
 
@@ -305,6 +306,26 @@ static void show_date(void) {
   }
 }
 
+/* A tap wakes the screen, and it is the only gesture a watchface receives:
+ * buttons belong to the timeline, the launcher and the system. Revealing the
+ * date is idempotent, so an accidental tap costs nothing. */
+static void tap_handler(AccelAxisType axis, int32_t direction) {
+  if (app->tapdate) {
+    show_date();
+  }
+}
+
+/* Only some platforms can see the backlight: emery, flint and gabbro. On
+ * aplite, basalt, chalk and diorite the service is a compiled-out stub, so
+ * this whole branch disappears. */
+#ifdef _PBL_API_EXISTS_backlight_service_subscribe
+static void backlight_handler(bool on) {
+  if (on) {
+    show_date();
+  }
+}
+#endif
+
 /* Coming back from an app is the moment someone orientates themselves, so
  * that is when the date earns its place. */
 static void focus_handler(bool in_focus) {
@@ -425,6 +446,11 @@ static void inbox_received(DictionaryIterator *it, void *context) {
     persist_write_int(8, app->caps);
     dirty = true;
   }
+  if ((t = dict_find(it, MESSAGE_KEY_TapDate))) {
+    app->tapdate = t->value->int32 ? 1 : 0;
+    persist_write_int(11, app->tapdate);
+    dirty = true;
+  }
   if ((t = dict_find(it, MESSAGE_KEY_DateHold))) {
     app->datehold = (uint8_t)t->value->int32;
     persist_write_int(10, app->datehold);
@@ -485,6 +511,7 @@ static void send_settings_to_phone(void) {
   dict_write_int8(iter, MESSAGE_KEY_Case, (int8_t)app->caps);
   dict_write_int8(iter, MESSAGE_KEY_Transition, (int8_t)app->trans);
   dict_write_int8(iter, MESSAGE_KEY_DateHold, (int8_t)app->datehold);
+  dict_write_int8(iter, MESSAGE_KEY_TapDate, (int8_t)app->tapdate);
   app_message_outbox_send();
 }
 
@@ -531,6 +558,7 @@ static void init(void) {
   app->caps      = persist_exists(8) ? persist_read_int(8) : 0;
   app->trans     = persist_exists(9) ? persist_read_int(9) : 2;
   app->datehold  = persist_exists(10) ? persist_read_int(10) : 0;
+  app->tapdate   = persist_exists(11) ? persist_read_int(11) : 0;
 
   app->last_hour = -1;
   app->last_minute = -1;
@@ -560,6 +588,10 @@ static void init(void) {
 
   tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
   app_focus_service_subscribe(focus_handler);
+  accel_tap_service_subscribe(tap_handler);
+#ifdef _PBL_API_EXISTS_backlight_service_subscribe
+  backlight_service_subscribe(backlight_handler);
+#endif
   unobstructed_area_service_subscribe((UnobstructedAreaHandlers){
     .change = unobstructed_change,
   }, NULL);
@@ -594,6 +626,10 @@ static void deinit(void) {
   tick_timer_service_unsubscribe();
   unobstructed_area_service_unsubscribe();
   app_focus_service_unsubscribe();
+  accel_tap_service_unsubscribe();
+#ifdef _PBL_API_EXISTS_backlight_service_subscribe
+  backlight_service_unsubscribe();
+#endif
 
   window_destroy(app->window);
 
