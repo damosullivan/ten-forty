@@ -1,8 +1,7 @@
-# Sliding Time v2
+# Ten Forty
 
-A word-clock watchface for Pebble: three rows slide sideways to spell the time
-in words. Built on Pebble's MIT-licensed Sliding Text, re-set in Iosevka with a
-baseline grid that fills the screen.
+A text clock for Pebble: three stacked words spell the time, set in Iosevka
+with a baseline grid that fills the screen.
 
 ## Build
 
@@ -57,7 +56,7 @@ pushes on startup -- only when you press Save.
 The word generator has a host-side test, no watch or SDK needed:
 
 ```sh
-v2/test/run.sh
+ten-forty/test/run.sh
 ```
 
 It checks that no row can exceed seven characters (the width the minute font
@@ -100,7 +99,7 @@ The TTFs are **not committed** (three weights of the full build are 24 MB).
 After a fresh clone, fetch them before building:
 
 ```sh
-v2/scripts/fetch-fonts.sh
+ten-forty/scripts/fetch-fonts.sh
 ```
 
 ## Caveats

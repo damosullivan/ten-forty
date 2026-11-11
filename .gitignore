@@ -1,5 +1,5 @@
 # Build output
-v2/build/
+ten-forty/build/
 build/
 
 # Upstream reference clone (keeps its own git history; see README for the URL)
@@ -12,8 +12,8 @@ shots/
 
 # waf build lock
 .lock-waf*
-v2/.lock-waf*
+ten-forty/.lock-waf*
 
 # Fonts are fetched, not committed: three Iosevka weights are 24 MB.
-# Run v2/scripts/fetch-fonts.sh after cloning.
-v2/resources/fonts/font-*.ttf
+# Run ten-forty/scripts/fetch-fonts.sh after cloning.
+ten-forty/resources/fonts/font-*.ttf

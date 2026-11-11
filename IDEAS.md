@@ -26,7 +26,7 @@ Deferred by decision, not by accident. Nothing here is started.
 ## Motion
 
 - **Per-row slide direction.** Hour slides down as minutes slide up. Nobody in
-  the Sliding Text family has done it; roughly 10 lines.
+  no face in this family has done it; roughly 10 lines.
 - **Differential sliding.** Only slide the letters that actually changed
   ("seventy" -> "seventy one" moves just the tail). Calmer than re-sliding the
   whole word. This is what Mongo Time / Reel Time get right.
@@ -61,7 +61,7 @@ Deferred by decision, not by accident. Nothing here is started.
 - **Publishing.** Needs a permanent UUID, 80x80 and 144x144 icons, per-platform
   screenshots and GIFs, then `pebble login` + `pebble publish`.
 - **i18n.** `words.c` is English-only; the original face was translated many
-  times over (see Sliding Text International and friends).
+  times over by other faces in this genre.
 
 ## Known upstream quirk
 

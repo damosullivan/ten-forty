@@ -1,5 +1,5 @@
 {
-  "name": "sliding-time-v2",
+  "name": "ten-forty",
   "author": "Damien",
   "version": "0.1.0",
   "private": true,
@@ -8,7 +8,7 @@
   ],
   "dependencies": {},
   "pebble": {
-    "displayName": "Sliding Time v2",
+    "displayName": "Ten Forty",
     "uuid": "6f1c2b40-8a3d-4e57-9c21-7b5e0d4a9f13",
     "sdkVersion": "3",
     "enableMultiJS": true,
@@ -245,5 +245,5 @@
       ]
     }
   },
-  "description": "A text clock for Pebble. Three stacked words set in Iosevka: the hour bold, the minutes light. Optional date, seven typographic settings, no clutter."
+  "description": "A text clock for Pebble. Three stacked words set in Iosevka: the hour bold, the minutes light. Optional date, eight typographic settings, no clutter."
 }

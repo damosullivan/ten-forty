@@ -1,4 +1,4 @@
-/* Sliding Time v2 - settings plumbing
+/* Ten Forty - settings plumbing
  *
  * The config page is embedded below and handed to the phone as a data: URI,
  * which works on Android and in the emulator. For iOS (and for a published
@@ -11,7 +11,7 @@ var DEFAULT_OPTS = { Theme: 0, Align: 0, DateAlign: 1, DatePos: 2, OhWords: 1, W
 
 function loadOpts() {
   try {
-    var raw = localStorage.getItem('sliding-time-v2');
+    var raw = localStorage.getItem('ten-forty');
     if (raw) {
       var o = JSON.parse(raw);
       var out = {};
@@ -25,7 +25,7 @@ function loadOpts() {
 }
 
 function saveOpts(o) {
-  try { localStorage.setItem('sliding-time-v2', JSON.stringify(o)); } catch (e) {}
+  try { localStorage.setItem('ten-forty', JSON.stringify(o)); } catch (e) {}
 }
 
 function sendOpts(o) {
@@ -89,7 +89,7 @@ function buildConfigHtml() {
   return '<!doctype html><html><head><meta charset="utf-8">' +
          '<meta name="viewport" content="width=device-width,initial-scale=1">' +
          '<style>' + css + '</style></head><body>' +
-         '<h1>Sliding Time v2</h1>' + body +
+         '<h1>Ten Forty</h1>' + body +
          '<button id="save">Save</button>' +
          '<script>' + js + '<\/script></body></html>';
 }

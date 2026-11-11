@@ -1,6 +1,6 @@
 # Store listing copy
 
-Draft. The name is still open — see the end of this file.
+Chosen name: **Ten Forty**.
 
 ## Description
 
@@ -36,14 +36,8 @@ Round 2.
 
 ## Name
 
-Still undecided. Candidates, all currently free in the store index:
+**Ten Forty.** Chosen. Applied to `displayName`, the README, this file and the
+project directory.
 
-- **Ten Forty** — the favourite so far
-- **Seventeen Fifty Nine** — too long to say
-- **Two Thirty** — pun, dates badly
-- **In Words** / **Set in Words** — descriptive, forgettable
-- **Wordmark** — type-ish, but overused
-
-The listing name defaults to `displayName` in `package.json`. It can be
-overridden at submit time, but whatever people see installed comes from
-`displayName`, so change it there if the name changes.
+The listing name defaults to `displayName` in `package.json`; whatever people
+see installed comes from there, so it is the one to keep in step.

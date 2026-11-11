@@ -2,7 +2,7 @@
 
 Parked 2026-11-11. Nothing here is started. Research done, decisions open.
 
-Current build: `v2/`, 198 KB pbw, five platforms, SDK 4.44.
+Current build: `ten-forty/`, 198 KB pbw, five platforms, SDK 4.44.
 Store: https://apps.repebble.com · Dashboard: https://developer.repebble.com/dashboard
 
 ## Facts worth keeping
@@ -29,18 +29,14 @@ Store: https://apps.repebble.com · Dashboard: https://developer.repebble.com/da
 
 - [ ] **Freeze the UUID.** Currently `6f1c2b40-8a3d-4e57-9c21-7b5e0d4a9f13`.
       Decide once, then never change it.
-- [ ] **Pick the name.** `displayName` is "Sliding Time v2" — reads like a dev
-      build. Store index checked: "Sliding Time" is free, but sits close to
-      Pebble's "Sliding Text" and singleserveapps' "Sliding Time Weather".
-      Open question.
+- [x] **Name: Ten Forty.** Applied to `displayName`, README, STORE.md and the
+      project directory. Store index checked: free.
 - [ ] **Host the config page.** `Pebble.openURL` uses a `data:` URI, which
       iOS refuses to load — every iPhone user gets a dead settings button.
       Host `config.html`, set `CONFIG_URL` in `src/pkjs/index.js`.
-- [ ] **Add MIT attribution.** We derive from Pebble's MIT-licensed Sliding
-      Text (coredevices/pebble-apps/sliding-text, (c) 2015 Pebble Examples).
-      MIT requires the notice to travel with the work. `resources/fonts/OFL.txt`
-      covers Iosevka only. Add a `LICENSE` with the upstream notice plus
-      whatever licence covers our changes.
+- [x] **MIT attribution.** Done: `LICENSE.md` carries the upstream MIT notice
+      and the font licence pointer. It is the only file that names the upstream
+      project; the README and store copy do not.
 
 ## Ready
 
