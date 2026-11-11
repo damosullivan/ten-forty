@@ -84,7 +84,9 @@ way:
 Rows are placed on a baseline grid: `anchor = 85 * screen_height / 168`, pitch
 `= 1.07 * hour_size`, so the stack scales with the display. The date is drawn in
 the margin rather than reserving a strip, which is how the upstream face wasted
-~38px at the bottom -- which also means hiding the date cannot move the time.
+~38px at the bottom. The words centre in whatever space the date leaves, so
+turning the date off recentres them -- a one-off shift when the setting
+changes, not something that happens while you are looking at it.
 
 Animation is a self-cancelling 40ms `AppTimer` that only runs while rows are
 moving, then stops. Nothing ticks between minutes.

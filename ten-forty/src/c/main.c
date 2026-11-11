@@ -127,7 +127,18 @@ static GRect visible_bounds(void) {
  * so a 200x228 Time 2 gets the same proportions as a Time. */
 static int16_t row_baseline(int i) {
   GRect b = visible_bounds();
-  int16_t anchor = (int16_t)(((int32_t)b.size.h * 85) / 168);
+  int16_t anchor = (int16_t)(((int32_t)b.size.h * 94) / 168);
+
+  /* Centre the words in the space the date leaves, rather than in the whole
+   * screen: a date at the bottom pushes them up, one at the top pushes them
+   * down, and with no date they get the full height. */
+  if (app->datepos == 1) {
+    anchor += (int16_t)((1 + app->h_date) / 2);
+  } else if (app->datepos == 2) {
+    int16_t dtop = (int16_t)(b.size.h - app->h_date - 2);
+    anchor -= (int16_t)((b.size.h - dtop) / 2);
+  }
+
   return anchor + (i - 1) * app->pitch;
 }
 

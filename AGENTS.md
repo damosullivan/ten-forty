@@ -33,9 +33,11 @@ improvements were considered and deliberately rejected.
 - **Iosevka being monospace is load-bearing.** 0.5em advance makes row widths
   predictable, and means changing letter case never changes layout.
 - **Layout derives from live font metrics**, not a fixed pixel grid, so it
-  scales across displays. The date is drawn *in the margin* and never reserves
-  a strip — that is why hiding it cannot move the time, and why the original
-  face's ~38px of dead space at the bottom is gone.
+  scales across displays. The date is drawn in the margin rather than reserving
+  a strip, and the words are centred in whatever space the date leaves: with no
+  date they centre in the full screen, with a date at the bottom they sit
+  higher, with it at the top they sit lower. Changing the date setting
+  therefore shifts the words once, by design.
 - **24-hour mode was removed.** Spelled-out 24h does not fit: "seventeen" needs
   a ~30px font and "twenty-three" ~22px against 37px normally. Do not
   reintroduce it without solving that first.
@@ -157,6 +159,12 @@ observe the backlight (`#ifdef _PBL_API_EXISTS_backlight_service_subscribe`).
 **The watch owns the settings.** It persists them and pushes them to the phone
 on launch; the phone mirrors them and pushes only when the user saves. Do not
 push from the JS `ready` handler — that used to silently overwrite the watch.
+
+**Vertical centring is calibrated, not derived.** The anchor is
+`screen_height * 94 / 168` and the ink centre lands about 10px below it. That
+94 was measured, not calculated — if you change the hour font size or the
+pitch, re-measure the top and bottom margins with `shot.sh` or the ink-band
+snippet rather than trusting the number.
 
 **Emulator hygiene.** A stale emulator shows another app, a crash dialog, or
 your app highlighted but not launched. `pebble kill && pebble wipe`, then
