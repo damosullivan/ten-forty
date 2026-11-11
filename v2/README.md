@@ -50,6 +50,18 @@ hour is already distinguished by weight and size.
 
 Tapping the watch also toggles light/dark.
 
+## Tests
+
+The word generator has a host-side test, no watch or SDK needed:
+
+```sh
+v2/test/run.sh
+```
+
+It checks that no row can exceed seven characters (the width the minute font
+allows) across all 60 minutes and all 12 hours. Eight characters is silently
+clipped by the text layer, which is how "thirteen" once rendered as "thirt...".
+
 ## Platforms
 
 Targets basalt, flint, chalk, emery and gabbro. Aplite and diorite are excluded:

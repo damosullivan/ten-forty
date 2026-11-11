@@ -15,13 +15,16 @@ static const char *const TENS[] = {
 };
 
 /* 10..19 that fit on a single row */
+/* Every row must fit seven characters at the minute size, so any teen longer
+ * than that is split across the two rows. "thirteen" is the only one that was
+ * being clipped. */
 static const char *const TEENS_WHOLE[] = {
-  "ten", "eleven", "twelve", "thirteen", NULL, "fifteen", "sixteen", NULL, NULL, NULL
+  "ten", "eleven", "twelve", NULL, NULL, "fifteen", "sixteen", NULL, NULL, NULL
 };
 
 /* 10..19 that split into two rows: "<head>" and "teen" */
 static const char *const TEENS_SPLIT_HEAD[] = {
-  NULL, NULL, NULL, NULL, "four", NULL, NULL, "seven", "eight", "nine"
+  NULL, NULL, NULL, "thir", "four", NULL, NULL, "seven", "eight", "nine"
 };
 
 static void copy(char *dst, const char *src) {
