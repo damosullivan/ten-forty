@@ -74,7 +74,7 @@ way:
 
 | Platform        | Screen   | Hour | Minutes | Date |
 |-----------------|----------|------|---------|------|
-| basalt, flint   | 144x168  | 44   | 37      | 16   |
+| basalt, flint   | 144x168  | 44   | 36      | 16   |
 | chalk           | 180x180  | 48   | 40      | 17   |
 | emery           | 200x228  | 61   | 51      | 22   |
 | gabbro          | 260x260  | 70   | 59      | 26   |

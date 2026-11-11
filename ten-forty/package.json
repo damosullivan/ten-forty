@@ -50,9 +50,9 @@
         },
         {
           "type": "font",
-          "name": "FONT_MIN_LIGHT_37",
+          "name": "FONT_MIN_LIGHT_36",
           "file": "fonts/font-light.ttf",
-          "pixelHeight": 37,
+          "pixelHeight": 36,
           "characterRegex": "[0-9A-Za-z' \\-]",
           "targetPlatforms": [
             "basalt",
@@ -61,9 +61,9 @@
         },
         {
           "type": "font",
-          "name": "FONT_MIN_REG_37",
+          "name": "FONT_MIN_REG_36",
           "file": "fonts/font-regular.ttf",
-          "pixelHeight": 37,
+          "pixelHeight": 36,
           "characterRegex": "[0-9A-Za-z' \\-]",
           "targetPlatforms": [
             "basalt",
@@ -194,9 +194,9 @@
         },
         {
           "type": "font",
-          "name": "FONT_HOUR_70",
+          "name": "FONT_HOUR_68",
           "file": "fonts/font-bold.ttf",
-          "pixelHeight": 70,
+          "pixelHeight": 68,
           "characterRegex": "[0-9A-Za-z' \\-]",
           "targetPlatforms": [
             "gabbro"
@@ -204,9 +204,9 @@
         },
         {
           "type": "font",
-          "name": "FONT_MIN_LIGHT_59",
+          "name": "FONT_MIN_LIGHT_58",
           "file": "fonts/font-light.ttf",
-          "pixelHeight": 59,
+          "pixelHeight": 58,
           "characterRegex": "[0-9A-Za-z' \\-]",
           "targetPlatforms": [
             "gabbro"
@@ -214,9 +214,9 @@
         },
         {
           "type": "font",
-          "name": "FONT_MIN_REG_59",
+          "name": "FONT_MIN_REG_58",
           "file": "fonts/font-regular.ttf",
-          "pixelHeight": 59,
+          "pixelHeight": 58,
           "characterRegex": "[0-9A-Za-z' \\-]",
           "targetPlatforms": [
             "gabbro"
