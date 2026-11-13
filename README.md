@@ -5,7 +5,7 @@ the hour bold, the minutes light.</em></p>
 
 <p align="center">
   <img src="images/basalt.png" height="150" alt="Ten Forty on a Pebble Time: ten, forty">
-  <img src="images/basalt-light.png" height="150" alt="Light theme: eleven, thirty, one">
+  <img src="images/basalt-light.png" height="150" alt="Light theme: ten, forty">
   <img src="images/chalk.png" height="150" alt="Ten Forty on a Pebble Time Round: one o'clock">
 </p>
 
