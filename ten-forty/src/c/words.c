@@ -14,17 +14,19 @@ static const char *const TENS[] = {
   "", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"
 };
 
-/* 10..19 that fit on a single row */
-/* Every row must fit seven characters at the minute size, so any teen longer
- * than that is split across the two rows. "thirteen" is the only one that was
- * being clipped. */
+/* 10..19 that fit on a single row. Every row must fit seven characters at the
+ * minute size, so any teen longer than that is split across the two rows.
+ * "thirteen" is the only one that was being clipped. */
 static const char *const TEENS_WHOLE[] = {
   "ten", "eleven", "twelve", NULL, NULL, "fifteen", "sixteen", NULL, NULL, NULL
 };
 
-/* 10..19 that split into two rows: "<head>" and "teen" */
+/* 10..19 that split into two rows: "<head>" and "teen". The split falls on the
+ * morpheme boundary, and "four", "seven", "eight" and "nine" are words, so they
+ * read as two fragments the eye joins without help. "thir" is not a word, so
+ * thirteen alone carries the hyphen that marks a word broken across a line. */
 static const char *const TEENS_SPLIT_HEAD[] = {
-  NULL, NULL, NULL, "thir", "four", NULL, NULL, "seven", "eight", "nine"
+  NULL, NULL, NULL, "thir-", "four", NULL, NULL, "seven", "eight", "nine"
 };
 
 static void copy(char *dst, const char *src) {
