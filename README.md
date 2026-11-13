@@ -48,8 +48,8 @@ diorite — are not targeted: three custom fonts do not fit in 24KB of heap.
 
 ## Settings
 
-Nine, all of them presentational, all of them persisted on the watch. The
-phone page is at
+Nine settings. All presentational, all persisted on the watch. The phone page
+is at
 [damosullivan.github.io/ten-forty/config.html](https://damosullivan.github.io/ten-forty/config.html).
 
 | Setting | Values |
@@ -62,7 +62,8 @@ phone page is at
 | Letter case | lowercase, UPPERCASE, Capital |
 | Transition | none, every row, or the hour only |
 
-The hour slides by default. So does the date when the day turns over.
+Only the hour slides by default: it is the one change anyone notices. The
+minute rows change where they stand.
 
 ## Notes
 
