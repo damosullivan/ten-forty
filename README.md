@@ -1,15 +1,13 @@
-<p align="center">
-  <img src="images/basalt.png" height="150" alt="Ten Forty on a Pebble Time: ten, forty, Fri 13">
-  <img src="images/basalt-light.png" height="150" alt="Light theme: eleven, thirty, one">
-  <img src="images/chalk.png" height="150" alt="Ten Forty on a Pebble Time Round">
-  <img src="images/emery.png" height="150" alt="Ten Forty on a Pebble 2">
-  <img src="images/gabbro.png" height="150" alt="Ten Forty on a Pebble Time 2">
-</p>
-
 <h1 align="center">Ten Forty</h1>
 
 <p align="center"><em>The time, spelled. Three stacked words in Iosevka —<br>
 the hour bold, the minutes light.</em></p>
+
+<p align="center">
+  <img src="images/basalt.png" height="150" alt="Ten Forty on a Pebble Time: ten, forty, Fri 13">
+  <img src="images/basalt-light.png" height="150" alt="Light theme: eleven, thirty, one">
+  <img src="images/chalk.png" height="150" alt="Ten Forty on a Pebble Time Round">
+</p>
 
 ---
 
@@ -35,8 +33,15 @@ pebble install --emulator basalt
 On a watch, turn on **Dev Connection** in the Pebble app and use
 `pebble install --cloudpebble`. There is no store listing yet.
 
-Basalt, flint, chalk, emery and gabbro. The 1-bit screens (aplite, diorite)
-are not targeted: three custom fonts do not fit in 24KB of heap.
+## Platforms
+
+Basalt, flint, chalk, emery and gabbro. The 1-bit screens — aplite and
+diorite — are not targeted: three custom fonts do not fit in 24KB of heap.
+
+<p align="center">
+  <img src="images/emery.png" height="130" alt="Ten Forty on a Pebble 2">
+  <img src="images/gabbro.png" height="130" alt="Ten Forty on a Pebble Time 2">
+</p>
 
 ## Settings
 
