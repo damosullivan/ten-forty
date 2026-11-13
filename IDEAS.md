@@ -63,8 +63,9 @@ Deferred by decision, not by accident. Nothing here is started.
   system fonts.
 - **Quick View.** Done: the words re-fit into the space above a notification and
   the date is skipped while it is up.
-- **Config page hosting.** Currently a `data:` URI, which iOS blocks. Needs
-  `config.html` hosted and `CONFIG_URL` in `src/pkjs/index.js` pointed at it.
+- **Config page hosting.** Done: GitHub Pages serves `docs/config.html`, and
+  `CONFIG_URL` in `src/pkjs/index.js` points at it. iOS blocks `data:` URIs,
+  which is what made this necessary rather than tidy.
 - **Publishing.** Needs a permanent UUID, 80x80 and 144x144 icons, per-platform
   screenshots and GIFs, then `pebble login` + `pebble publish`.
 - **i18n.** `words.c` is English-only; the original face was translated many

@@ -75,6 +75,10 @@ It checks that no row can exceed seven characters (the width the minute font
 allows) across all 60 minutes and all 12 hours. Eight characters is silently
 clipped by the text layer, which is how "thirteen" once rendered as "thirt...".
 
+The same script also fails if `docs/config.html` has drifted from
+`scripts/config-page.js`, which is what generates it. Regenerate with
+`node scripts/config-page.js --write`.
+
 ## Platforms
 
 Targets basalt, flint, chalk, emery and gabbro. Aplite and diorite are excluded:
@@ -123,9 +127,11 @@ ten-forty/scripts/fetch-fonts.sh
 
 ## Caveats
 
-- The config page is passed to the phone as a `data:` URI. Android and the
-  emulator handle it; iOS blocks `data:` URIs. For iOS, host `config.html` and
-  set `CONFIG_URL` in `src/pkjs/index.js`.
+- The settings page is served from GitHub Pages, at
+  `https://damosullivan.github.io/ten-forty/config.html`, and opened by the
+  phone as an https URL. It cannot be a `data:` URI: iOS refuses to load one,
+  which leaves iPhone users with a settings button that does nothing. The page
+  is generated into `docs/config.html` and committed; see `scripts/config-page.js`.
 - Quick View reflows the words into the space a notification leaves and drops
   the date while it is up. Round screens report no obstruction, so they keep
   their normal layout.

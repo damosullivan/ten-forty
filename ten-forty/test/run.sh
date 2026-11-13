@@ -1,13 +1,16 @@
 #!/bin/sh
 # Build and run the word generator test on the host. Font sizes and box widths
 # come from package.json, so the test follows the project rather than a copy of
-# its numbers.
+# its numbers. Also fails if the hosted settings page has drifted from the
+# script that generates it — a stale page is invisible until a user opens it.
 set -eu
 cd "$(dirname "$0")/.."
 
 hdr=$(mktemp)
 out=$(mktemp)
 trap 'rm -f "$hdr" "$out"' EXIT
+
+node scripts/config-page.js --check
 
 python3 - "$hdr" <<'PY'
 import json, sys

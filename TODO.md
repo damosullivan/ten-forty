@@ -31,9 +31,11 @@ Store: https://apps.repebble.com · Dashboard: https://developer.repebble.com/da
       Decide once, then never change it.
 - [x] **Name: Ten Forty.** Applied to `displayName`, README, STORE.md and the
       project directory. Store index checked: free.
-- [ ] **Host the config page.** `Pebble.openURL` uses a `data:` URI, which
-      iOS refuses to load — every iPhone user gets a dead settings button.
-      Host `config.html`, set `CONFIG_URL` in `src/pkjs/index.js`.
+- [x] **Host the config page.** Live at
+      `https://damosullivan.github.io/ten-forty/config.html` (GitHub Pages,
+      `main` / `/docs`). The phone opens that https URL; `CONFIG_URL` in
+      `src/pkjs/index.js` points at it. Regenerate with
+      `node scripts/config-page.js --write` whenever a setting changes.
 - [x] **MIT attribution.** Done: `LICENSE.md` carries the upstream MIT notice
       and the font licence pointer. It is the only file that names the upstream
       project; the README and store copy do not.
@@ -43,7 +45,7 @@ Store: https://apps.repebble.com · Dashboard: https://developer.repebble.com/da
 - [x] Released SDK build (4.44)
 - [x] PBW under 4.4 MB
 - [x] Five platforms: basalt, flint, chalk, emery, gabbro
-- [x] Config page works (Android at least)
+- [x] Config page works (Android, emulator, and hosted for iOS)
 
 ## To do
 
@@ -54,6 +56,9 @@ Store: https://apps.repebble.com · Dashboard: https://developer.repebble.com/da
 - [ ] Decide on a banner (optional, 720x320).
 - [ ] Decide whether to publish the source (source URL is optional but adds
       credibility, and we are standing on MIT code).
+- [ ] Confirm the settings page from an **iPhone**: the Pebble app has to load
+      the hosted page and hand the values back over `pebblejs://close`. This is
+      the only part of the hosting work that cannot be checked on a desktop.
 - [ ] Publish as **Unlisted**, install from the store on the real watch,
       confirm settings still work.
 - [ ] Flip to **Listed**.
