@@ -39,6 +39,12 @@
     "resources": {
       "media": [
         {
+          "type": "bitmap",
+          "name": "MENU_ICON",
+          "file": "images/menu-icon.png",
+          "menuIcon": true
+        },
+        {
           "type": "font",
           "name": "FONT_HOUR_44",
           "file": "fonts/font-bold.ttf",

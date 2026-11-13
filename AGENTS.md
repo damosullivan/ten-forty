@@ -81,7 +81,9 @@ in `ten-forty/STORE.md`.
     ├── test/            host-side word tests
     ├── scripts/fetch-fonts.sh
     ├── scripts/config-page.js  generates docs/config.html
+    ├── scripts/make-menu-icon.py  regenerates the launcher icon
     ├── resources/fonts/ TTFs NOT committed — see Gotchas
+    ├── resources/images/menu-icon.png  25x25 launcher icon, committed
     ├── screenshots/     per-platform captures
     ├── STORE.md
     └── README.md
@@ -177,6 +179,22 @@ adding one.
 
 **Fonts are not committed.** Three Iosevka weights are 24MB. `.gitignore` skips
 them and `scripts/fetch-fonts.sh` fetches v34.9.1. `OFL.txt` is committed.
+
+**The launcher icon is 25x25, and its digits sit on an opaque tile.** A bitmap
+resource with `menuIcon: true` becomes the icon the watch shows beside the name
+in the watchfaces list — and above it on chalk and gabbro, where the launcher
+lays that list out differently. The SDK caps the file at 25x25. The row being
+highlighted is white on basalt and emery, a dark bar on chalk and gabbro, and
+black on flint, and the launcher does not invert the icon consistently: ink on a
+transparent background simply disappeared against at least one of them, and
+`memoryFormat: "1Bit"` on an RGBA file rendered a plain white box. White behind
+the digits reads on all five and is how the stock icons are drawn. Regenerate
+with `python3 scripts/make-menu-icon.py`.
+
+**Changing a resource's config does not always rebuild its pbpack.** Editing
+`memoryFormat` or `targetPlatforms` left the old `.pbpack` in `build/`; touching
+the PNG did not shake it loose, because staleness is keyed to the file, not to
+the entry. If the icon looks wrong after a config change, `pebble clean` first.
 
 **The config page is hosted, and its platform filter runs in the browser.**
 iOS refuses to load a `data:` URI in the config webview, so the page is a real

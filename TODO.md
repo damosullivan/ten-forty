@@ -20,8 +20,10 @@ Store: https://apps.repebble.com · Dashboard: https://developer.repebble.com/da
 - Screenshots: exact platform display size, **unframed** (no watch outline),
   up to 5 per platform. `pebble screenshot --all-platforms` already writes
   correctly sized, correctly named files to `screenshots/`.
-- Banner 720x320 optional. **Icons are watchapp-only** — a watchface needs
-  none; they are generated from the name.
+- Banner 720x320 optional. **Store icons are watchapp-only** — a watchface needs
+  none, and the listing's are generated from the name. The icon beside the name
+  in the watch's own watchfaces list is a separate thing: a 25x25 bitmap
+  resource with `menuIcon: true` in the pbw.
 - Visibility: Listed / Unlisted / Hidden, changeable any time.
 - CI path exists: `PEBBLE_FIREBASE_ID_TOKEN` + `pebble publish --non-interactive`.
 
