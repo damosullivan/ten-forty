@@ -25,8 +25,8 @@ one sentence broken over three lines.
 
 ```sh
 cd ten-forty
-./scripts/fetch-fonts.sh      # Iosevka is 24MB and not committed
-pebble build                  # -> build/ten-forty.pbw
+./scripts/fetch-fonts.sh   # Iosevka: 24MB, not committed
+pebble build               # -> build/ten-forty.pbw
 pebble install --emulator basalt
 ```
 
@@ -53,7 +53,7 @@ phone page is at
 |---|---|
 | Theme | white on black, black on white |
 | Alignment | left, centre, right — words and date separately |
-| Date | hidden, top, bottom — `Tue 10`, `10 Nov`, `Tue 10 Nov`, `Tuesday` |
+| Date | hidden, top or bottom — `Tue 10` · `10 Nov` · `Tue 10 Nov` · `Tuesday` |
 | Single-digit minutes | `seven oh five` or `seven five` |
 | Font weight | light or regular |
 | Letter case | lowercase, UPPERCASE, Capital |
