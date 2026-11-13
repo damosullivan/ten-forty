@@ -69,6 +69,8 @@ in `ten-forty/STORE.md`.
 ├── TODO.md              publishing checklist
 ├── LICENSE.md           upstream MIT notice + font pointer
 ├── shot.sh              emulator screenshot + ink-band measurement helper
+├── images/              screenshots for the README (2x, clean names)
+├── README.md            the front page
 ├── baseline/            upstream clone (gitignored, has its own .git)
 ├── docs/                the settings page GitHub Pages serves; generated
 │   └── config.html      do not hand-edit — see Gotchas

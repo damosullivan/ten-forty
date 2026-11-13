@@ -2,8 +2,8 @@
 # usage: ./shot.sh HH:MM:SS [outfile]
 set -e
 export PATH="$HOME/.local/bin:$PATH"
-cd /home/damien/src/pebble/ten-forty
-t="$1"; out="${2:-/home/damien/src/pebble/shots/latest.png}"
+cd "$(dirname "$0")/ten-forty"
+t="$1"; out="${2:-/tmp/ten-forty-shot.png}"
 pebble emu-set-time "$t" --emulator basalt >/dev/null
 pebble install --emulator basalt >/dev/null 2>&1
 sleep 3
