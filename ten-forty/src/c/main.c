@@ -6,19 +6,40 @@
 #define ROWS 3
 #define MARGIN_X 6
 #define ANIM_FRAME_MS 40
+/* A row only travels as far as its own text, plus this much, so a four-letter
+ * word does not cross the whole screen to be replaced by another one. */
+#define SLIDE_GAP 4
 /* Ink clearance from the screen edge for the date row. The top value is a box
  * offset that lands the glyphs about 4px in; the bottom is the gap below. */
 #define DATE_EDGE_TOP 3
 #define DATE_EDGE_BOTTOM 5
+/* Clearance above and below the words when Quick View has taken the bottom of
+ * the screen. */
+#define QV_MARGIN 4
+
+/* Date formats are numbered 0 "Tue 10", 1 "10 Nov", 2 "Tue 10 Nov",
+ * 3 "Tuesday". The last two need more width than a round display has: the
+ * circle leaves the date an 8-character chord at the top and 9 at the bottom,
+ * so they are clamped away there rather than silently truncated with an
+ * ellipsis. The config page hides the same two options for the same reason. */
+#ifdef PBL_ROUND
+  #define DATE_FORMAT_MAX 1
+#else
+  #define DATE_FORMAT_MAX 3
+#endif
 
 /* ------------------------------------------------------------------- fonts
  * Sizes are picked per screen so each platform fills its width the same way.
  * Grouped by display width; the 144px group covers basalt and flint.
- */
+ *
+ * Chalk runs smaller than its 180px would allow: its display is a circle, and
+ * the chord at the top row's ascender height is narrow enough to cut into the
+ * first glyph. At 48px the mask ate most of the "f" in "four"; 40px sits low
+ * enough to clear it. */
 #if defined(PBL_PLATFORM_CHALK)
-  #define RID_HOUR    RESOURCE_ID_FONT_HOUR_48
-  #define RID_MIN_L   RESOURCE_ID_FONT_MIN_LIGHT_40
-  #define RID_MIN_R   RESOURCE_ID_FONT_MIN_REG_40
+  #define RID_HOUR    RESOURCE_ID_FONT_HOUR_40
+  #define RID_MIN_L   RESOURCE_ID_FONT_MIN_LIGHT_34
+  #define RID_MIN_R   RESOURCE_ID_FONT_MIN_REG_34
   #define RID_DATE_L  RESOURCE_ID_FONT_DATE_LIGHT_17
   #define RID_DATE_R  RESOURCE_ID_FONT_DATE_REG_17
 #elif defined(PBL_PLATFORM_EMERY)
@@ -50,6 +71,7 @@ typedef enum {
 typedef struct {
   SlideState state;
   char text[2][24];
+  int16_t w[2];       /* ink width of each string, in pixels */
   uint8_t buf;        /* which of the two strings is on screen */
   int16_t x;          /* horizontal offset, 0 == at rest */
   bool bold;
@@ -62,6 +84,7 @@ typedef struct {
   Row rows[ROWS];
   GFont f_bold, f_light, f_date;
   int16_t h_bold, h_light, h_date;
+  int16_t adv_bold, adv_light;   /* one character's advance, per weight */
 
   AppTimer *timer;   /* non-NULL only while rows are moving */
   int16_t pitch;     /* baseline-to-baseline distance */
@@ -78,7 +101,8 @@ typedef struct {
   uint8_t regular;   /* 0 = Iosevka Light, 1 = Iosevka Regular */
   uint8_t caps;      /* 0 lower, 1 UPPER, 2 Capital */
   uint8_t trans;     /* 0 none, 1 slide every row, 2 slide the hour only */
-  char date_text[16];
+  uint8_t datefmt;   /* 0 "Tue 10", 1 "10 Nov", 2 "Tue 10 Nov", 3 "Tuesday" */
+  char date_text[20];
 } App;
 
 static App *app;
@@ -127,10 +151,53 @@ static GRect visible_bounds(void) {
   return layer_get_unobstructed_bounds(window_get_root_layer(app->window));
 }
 
+/* Quick View covers the bottom third of the screen while a notification is up,
+ * and gives it back when it goes. The unobstructed bounds shrink to what is
+ * left, so the words have to be re-fitted into a much shorter area -- see
+ * row_baseline(). */
+static bool obstructed(void) {
+  return visible_bounds().size.h < layer_get_bounds(app->canvas).size.h;
+}
+
+/* Ink heights above and below a baseline, as fractions of the font size. These
+ * are measured off the rendered face: the tallest hour word ("seven") stands
+ * 26px above its baseline at 44px (0.59em), and the minutes' ink ends 5px below
+ * theirs at 36px (0.14em). Deriving them from the font's reported line height
+ * does not work -- Iosevka reports a tight box, and the text layer centres it
+ * in the box it is given. The hour ratio rounds up, so the tallest word still
+ * clears the top edge. */
+static int16_t ink_above(void) {
+  return (int16_t)(((int32_t)app->h_bold * 59) / 100);
+}
+
+static int16_t ink_below(void) {
+  return (int16_t)(((int32_t)app->h_light * 14) / 100);
+}
+
+/* The pitch the rows can afford in the height available. Obstructed, three rows
+ * at the usual leading do not fit -- on a Time that is 125px of ink in 117px of
+ * room -- so they close up rather than overflow at both ends. */
+static int16_t layout_pitch(int16_t avail) {
+  int16_t fit = (int16_t)((avail - QV_MARGIN * 2 - ink_above() - ink_below()) / 2);
+  if (fit < 12) fit = 12;   /* three rows never invert, however short the area */
+  return fit < app->pitch ? fit : app->pitch;
+}
+
 /* The layout is tuned on the reference 144x168 screen and scaled from there,
  * so a 200x228 Time 2 gets the same proportions as a Time. */
 static int16_t row_baseline(int i) {
   GRect b = visible_bounds();
+
+  if (obstructed()) {
+    /* Centre the ink band, not the baselines, in what is left. The 94/168
+     * anchor below is calibrated for the full screen and does not scale to a
+     * partial one, and the date has given up its strip (it is not drawn). */
+    int16_t pitch = layout_pitch(b.size.h);
+    int16_t ink = (int16_t)(2 * pitch + ink_above() + ink_below());
+    int16_t top = (int16_t)((b.size.h - ink) / 2);
+    return (int16_t)(top + ink_above() + i * pitch);
+  }
+
   int16_t anchor = (int16_t)(((int32_t)b.size.h * 94) / 168);
 
   /* Centre the words in the space the date leaves, rather than in the whole
@@ -175,7 +242,9 @@ static void canvas_update(Layer *layer, GContext *ctx) {
                        GTextOverflowModeFill, to_alignment(app->align), NULL);
   }
 
-  if (app->datepos && app->date_text[0]) {
+  /* Quick View leaves no room for the date: it would land on the minute row,
+   * and the notification is covering that part of the screen anyway. */
+  if (app->datepos && app->date_text[0] && !obstructed()) {
     GRect box = GRect(mx, date_y(), w, app->h_date);
 #if defined(PBL_ROUND)
     /* Keep the date inside the circle instead of clipping it in the corner. */
@@ -200,8 +269,16 @@ static void canvas_update(Layer *layer, GContext *ctx) {
 
 static int16_t abs16(int16_t v) { return v < 0 ? (int16_t)-v : v; }
 
+/* Monospace, so a row's ink width is just its length times the advance. */
+static int16_t row_width(const Row *r, const char *s) {
+  return (int16_t)(strlen(s) * (r->bold ? app->adv_bold : app->adv_light));
+}
+
 static void row_set_text(Row *r, const char *s, bool animate) {
   if (strcmp(r->text[r->buf], s) == 0) {
+    /* the text did not change, but a font change may have: keep the width the
+     * next slide measures its travel from honest */
+    r->w[r->buf] = row_width(r, r->text[r->buf]);
     return;
   }
 
@@ -210,6 +287,7 @@ static void row_set_text(Row *r, const char *s, bool animate) {
      * change atomic within this draw, and clears any slide that was pending. */
     strncpy(r->text[r->buf], s, sizeof(r->text[0]) - 1);
     r->text[r->buf][sizeof(r->text[0]) - 1] = '\0';
+    r->w[r->buf] = row_width(r, r->text[r->buf]);
     r->x = 0;
     r->state = IN_FRAME;
     return;
@@ -218,11 +296,13 @@ static void row_set_text(Row *r, const char *s, bool animate) {
   char *next = r->text[r->buf ^ 1];
   strncpy(next, s, sizeof(r->text[0]) - 1);
   next[sizeof(r->text[0]) - 1] = '\0';
+  r->w[r->buf ^ 1] = row_width(r, next);
 
   if (r->text[r->buf][0] == '\0') {
-    /* nothing on screen yet: fly in from the right */
+    /* the row was blank, so there is nothing to move out: the new word comes
+     * in from just past where it lands rather than from the screen edge */
     r->buf ^= 1;
-    r->x = layer_get_bounds(app->canvas).size.w;
+    r->x = (int16_t)(r->w[r->buf] + SLIDE_GAP);
     r->state = MOVING_IN;
   } else {
     r->state = MOVING_OUT;
@@ -230,8 +310,6 @@ static void row_set_text(Row *r, const char *s, bool animate) {
 }
 
 static bool row_step(Row *r) {
-  const int16_t w = layer_get_bounds(app->canvas).size.w;
-
   switch (r->state) {
     case MOVING_IN: {
       r->x -= abs16(r->x) / 3 + 1;
@@ -244,9 +322,10 @@ static bool row_step(Row *r) {
 
     case MOVING_OUT: {
       r->x -= abs16(r->x) / 3 + 1;
-      if (r->x <= -w) {
-        r->x = w;
+      /* Travel only as far as this word needs to leave, not the whole screen. */
+      if (r->x <= -(int16_t)(r->w[r->buf] + SLIDE_GAP)) {
         r->buf ^= 1;
+        r->x = (int16_t)(r->w[r->buf] + SLIDE_GAP);
         r->state = MOVING_IN;
       }
       return true;
@@ -299,8 +378,33 @@ static void refresh_date(const struct tm *t) {
   static const char *const DAYS[] = {
     "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
   };
-  snprintf(app->date_text, sizeof(app->date_text), "%s %d",
-           DAYS[t->tm_wday], t->tm_mday);
+  static const char *const DAYS_LONG[] = {
+    "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+  };
+  static const char *const MONTHS[] = {
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  };
+  const int wd = t->tm_wday;
+  const int mon = t->tm_mon;
+
+  switch (app->datefmt) {
+    case 1:
+      snprintf(app->date_text, sizeof(app->date_text), "%d %s",
+               t->tm_mday, MONTHS[mon]);
+      break;
+    case 2:
+      snprintf(app->date_text, sizeof(app->date_text), "%s %d %s",
+               DAYS[wd], t->tm_mday, MONTHS[mon]);
+      break;
+    case 3:
+      snprintf(app->date_text, sizeof(app->date_text), "%s", DAYS_LONG[wd]);
+      break;
+    default:
+      snprintf(app->date_text, sizeof(app->date_text), "%s %d",
+               DAYS[wd], t->tm_mday);
+      break;
+  }
   to_case(app->date_text);
   app->last_day = t->tm_mday;
 }
@@ -341,10 +445,26 @@ static int16_t line_height(GFont f) {
              GTextOverflowModeFill, GTextAlignmentLeft).h;
 }
 
+/* One character's advance, taken as the difference between two strings so the
+ * box padding cancels out. Iosevka is monospace, so this is the whole of the
+ * geometry a sliding row needs -- the rasteriser rounds each advance up to a
+ * whole pixel, which makes a hardcoded size / 2 subtly wrong. */
+static int16_t advance_for(GFont f) {
+  GRect probe = GRect(0, 0, 260, 260);
+  int16_t two = graphics_text_layout_get_content_size("HH", f, probe,
+                GTextOverflowModeFill, GTextAlignmentLeft).w;
+  int16_t three = graphics_text_layout_get_content_size("HHH", f, probe,
+                  GTextOverflowModeFill, GTextAlignmentLeft).w;
+  int16_t adv = (int16_t)(three - two);
+  return adv > 0 ? adv : (int16_t)((line_height(f) + 1) / 2);
+}
+
 static void measure(void) {
   app->h_bold = line_height(app->f_bold);
   app->h_light = line_height(app->f_light);
   app->h_date = line_height(app->f_date);
+  app->adv_bold = advance_for(app->f_bold);
+  app->adv_light = advance_for(app->f_light);
   /* Iosevka's reported line height is tight (== pixel height), so derive the
    * leading from the glyph size instead of the box height. */
   app->pitch = (int16_t)(((int32_t)app->h_bold * 107) / 100);
@@ -374,6 +494,12 @@ static void apply_weight(void) {
   layer_mark_dirty(app->canvas);
 }
 
+/* A value set on a rectangular watch can outlive a switch to a round one, and
+ * the round form is built without the wide formats compiled in above. */
+static uint8_t clamp_datefmt(uint8_t v) {
+  return v > DATE_FORMAT_MAX ? 0 : v;
+}
+
 static void inbox_received(DictionaryIterator *it, void *context) {
   Tuple *t;
   bool dirty = false;
@@ -392,6 +518,11 @@ static void inbox_received(DictionaryIterator *it, void *context) {
   if ((t = dict_find(it, MESSAGE_KEY_DateAlign))) {
     app->datealign = (uint8_t)t->value->int32;
     persist_write_int(6, app->datealign);
+    dirty = true;
+  }
+  if ((t = dict_find(it, MESSAGE_KEY_DateFormat))) {
+    app->datefmt = clamp_datefmt((uint8_t)t->value->int32);
+    persist_write_int(12, app->datefmt);
     dirty = true;
   }
   if ((t = dict_find(it, MESSAGE_KEY_DatePos))) {
@@ -434,6 +565,7 @@ static void inbox_received(DictionaryIterator *it, void *context) {
     apply_theme();
     time_t now = time(NULL);
     struct tm tm_now = *localtime(&now);
+    refresh_date(&tm_now);
     refresh_time(&tm_now, false);
     layer_mark_dirty(window_get_root_layer(app->window));
     layer_mark_dirty(app->canvas);
@@ -452,6 +584,7 @@ static void send_settings_to_phone(void) {
   dict_write_int8(iter, MESSAGE_KEY_Theme, (int8_t)app->theme);
   dict_write_int8(iter, MESSAGE_KEY_Align, (int8_t)app->align);
   dict_write_int8(iter, MESSAGE_KEY_DateAlign, (int8_t)app->datealign);
+  dict_write_int8(iter, MESSAGE_KEY_DateFormat, (int8_t)app->datefmt);
   dict_write_int8(iter, MESSAGE_KEY_DatePos, (int8_t)app->datepos);
   dict_write_int8(iter, MESSAGE_KEY_OhWords, (int8_t)app->oh);
   dict_write_int8(iter, MESSAGE_KEY_Weight, (int8_t)app->regular);
@@ -495,13 +628,14 @@ static void init(void) {
   memset(app, 0, sizeof(App));
 
   app->theme     = persist_exists(1) ? persist_read_int(1) : 0;
-  app->align     = persist_exists(2) ? persist_read_int(2) : 0;
+  app->align     = persist_exists(2) ? persist_read_int(2) : PBL_IF_ROUND_ELSE(1, 0);
   app->datepos   = persist_exists(4) ? persist_read_int(4) : 2;
   app->oh        = persist_exists(5) ? persist_read_int(5) : 1;
   app->datealign = persist_exists(6) ? persist_read_int(6) : 1;
   app->regular   = persist_exists(7) ? persist_read_int(7) : 0;
   app->caps      = persist_exists(8) ? persist_read_int(8) : 0;
   app->trans     = persist_exists(9) ? persist_read_int(9) : 2;
+  app->datefmt   = clamp_datefmt(persist_exists(12) ? persist_read_int(12) : 0);
 
   app->last_hour = -1;
   app->last_minute = -1;

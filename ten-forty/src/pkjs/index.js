@@ -7,7 +7,9 @@
 
 var CONFIG_URL = null; /* set to 'https://example.com/config.html' if hosted */
 
-var DEFAULT_OPTS = { Theme: 0, Align: 0, DateAlign: 1, DatePos: 2, OhWords: 1, Weight: 0, Case: 0, Transition: 2 };
+var DEFAULT_OPTS = { Theme: 0, Align: 0, DateAlign: 1, DateFormat: 0, DatePos: 2, OhWords: 1, Weight: 0, Case: 0, Transition: 2 };
+
+var KEYS = ["Theme", "Align", "DateAlign", "DateFormat", "DatePos", "OhWords", "Weight", "Case", "Transition"];
 
 function loadOpts() {
   try {
@@ -40,7 +42,7 @@ function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function buildConfigHtml() {
+function buildConfigHtml(maxDate) {
   var css = [
     'body{background:#111;color:#eee;font:15px/1.4 -apple-system,Roboto,sans-serif;margin:0;padding:18px}',
     'h1{font-size:17px;font-weight:600;margin:0 0 18px}',
@@ -49,10 +51,22 @@ function buildConfigHtml() {
     'button{width:100%;margin-top:26px;padding:14px;font-size:15px;font-weight:600;background:#eee;color:#111;border:0;border-radius:6px}'
   ].join('');
 
+  /* The two wide formats are not offered on a round display: the circle leaves
+   * the date an 8-character chord at the top, and the text layer truncates with
+   * an ellipsis rather than wrapping. The watch clamps the same values, so a
+   * setting carried over from a rectangular watch cannot break the layout. */
+  var dateFormats = [
+    ['0', 'Tue 10'],
+    ['1', '10 Nov'],
+    ['2', 'Tue 10 Nov'],
+    ['3', 'Tuesday']
+  ].filter(function (o) { return parseInt(o[0], 10) <= maxDate; });
+
   var fields = [
     ['Theme', 'Theme', [['0', 'White on black'], ['1', 'Black on white']]],
     ['Align', 'Time alignment', [['0', 'Left'], ['1', 'Centre'], ['2', 'Right']]],
     ['DateAlign', 'Date alignment', [['0', 'Left'], ['1', 'Centre'], ['2', 'Right']]],
+    ['DateFormat', 'Date format', dateFormats],
     ['DatePos', 'Date', [['0', 'Hidden'], ['1', 'Top'], ['2', 'Bottom']]],
     ['OhWords', 'Single-digit minutes', [['1', 'Seven oh five'], ['0', 'Seven five']]],
     ['Weight', 'Font weight', [['0', 'Light'], ['1', 'Regular']]],
@@ -73,13 +87,16 @@ function buildConfigHtml() {
   var js = [
     'var o=JSON.parse(decodeURIComponent((location.hash||location.search).slice(1))||"{}");',
     'var D=' + JSON.stringify(DEFAULT_OPTS) + ';',
-    '["Theme","Align","DateAlign","DatePos","OhWords","Weight","Case","Transition"].forEach(function(k){',
+    'var K=' + JSON.stringify(KEYS) + ';',
+    'K.forEach(function(k){',
     '  var e=document.getElementById(k);',
     '  e.value=String(o[k]===undefined?D[k]:o[k]);',
+    /* a format this watch does not offer, carried over from another one */
+    '  if(!e.value)e.value=String(D[k]);',
     '});',
     'document.getElementById("save").addEventListener("click",function(){',
     '  var out={};',
-    '  ["Theme","Align","DateAlign","DatePos","OhWords","Weight","Case","Transition"].forEach(function(k){',
+    '  K.forEach(function(k){',
     '    out[k]=parseInt(document.getElementById(k).value,10);',
     '  });',
     '  document.location="pebblejs://close#"+encodeURIComponent(JSON.stringify(out));',
@@ -111,17 +128,35 @@ Pebble.addEventListener('appmessage', function (e) {
   if (changed) saveOpts(opts);
 });
 
+/* A round display gives the date a narrow chord at the top, so the two wide
+ * formats are withheld there rather than shown and truncated. Any failure
+ * offers all of them and lets the watch clamp. */
+function maxDateFormat() {
+  try {
+    var info = Pebble.getActiveWatchInfo();
+    var p = (info && info.platform) || '';
+    if (p === 'chalk' || p === 'gabbro') return 1;
+  } catch (e) { /* not connected, or an app without the call */ }
+  return 3;
+}
+
 Pebble.addEventListener('showConfiguration', function () {
   var opts = loadOpts();
+  var max = maxDateFormat();
+
+  var payload = JSON.parse(JSON.stringify(opts));
+  /* a hosted config page has to make the same choice for itself */
+  payload._maxDate = max;
+
+  /* the '#' must stay outside the encoded payload, otherwise the settings
+   * JSON becomes part of the document instead of the fragment */
+  var fragment = '#' + encodeURIComponent(JSON.stringify(payload));
   var url;
   if (CONFIG_URL) {
-    url = CONFIG_URL + '#' + encodeURIComponent(JSON.stringify(opts));
+    url = CONFIG_URL + fragment;
   } else {
-    /* the '#' must stay outside the encoded payload, otherwise the settings
-     * JSON becomes part of the document instead of the fragment */
     url = 'data:text/html;charset=utf-8,' +
-          encodeURIComponent(buildConfigHtml()) +
-          '#' + encodeURIComponent(JSON.stringify(opts));
+          encodeURIComponent(buildConfigHtml(max)) + fragment;
   }
   Pebble.openURL(url);
 });

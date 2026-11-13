@@ -29,6 +29,7 @@
       "Align",
       "Case",
       "DateAlign",
+      "DateFormat",
       "DatePos",
       "OhWords",
       "Theme",
@@ -94,9 +95,9 @@
         },
         {
           "type": "font",
-          "name": "FONT_HOUR_48",
+          "name": "FONT_HOUR_40",
           "file": "fonts/font-bold.ttf",
-          "pixelHeight": 48,
+          "pixelHeight": 40,
           "characterRegex": "[0-9A-Za-z' \\-]",
           "targetPlatforms": [
             "chalk"
@@ -104,9 +105,9 @@
         },
         {
           "type": "font",
-          "name": "FONT_MIN_LIGHT_40",
+          "name": "FONT_MIN_LIGHT_34",
           "file": "fonts/font-light.ttf",
-          "pixelHeight": 40,
+          "pixelHeight": 34,
           "characterRegex": "[0-9A-Za-z' \\-]",
           "targetPlatforms": [
             "chalk"
@@ -114,9 +115,9 @@
         },
         {
           "type": "font",
-          "name": "FONT_MIN_REG_40",
+          "name": "FONT_MIN_REG_34",
           "file": "fonts/font-regular.ttf",
-          "pixelHeight": 40,
+          "pixelHeight": 34,
           "characterRegex": "[0-9A-Za-z' \\-]",
           "targetPlatforms": [
             "chalk"
@@ -245,5 +246,5 @@
       ]
     }
   },
-  "description": "A text clock for Pebble. Three stacked words set in Iosevka: the hour bold, the minutes light. Optional date, eight typographic settings, no clutter."
+  "description": "A text clock for Pebble. Three stacked words set in Iosevka: the hour bold, the minutes light. Optional date, nine typographic settings, no clutter."
 }

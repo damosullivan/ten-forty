@@ -7,7 +7,7 @@ at the end of the session that built most of it.
 
 **Ten Forty**, a text-clock watchface for Pebble. The time is spelled in three
 stacked words — hour, minute-tens, minute-ones — set in Iosevka, hour bold,
-minutes light. Optional date. Eight settings, all of them presentational.
+minutes light. Optional date. Nine settings, all of them presentational.
 
 Targets basalt, flint, chalk, emery, gabbro. Developed and tested on a Pebble
 Time Steel (basalt) using the real hardware via CloudPebble.
@@ -25,13 +25,22 @@ improvements were considered and deliberately rejected.
   from, not what it is. The face is a text clock.
 - **Sliding is now a transition, not the identity.** It defaults to sliding the
   *hour row only*, because that is the one change anyone notices. Options are
-  none / every row / hour only.
+  none / every row / hour only. A row travels only as far as its own text
+  (`w + SLIDE_GAP`), not the screen width, so "every row" moves by the width of
+  a word; letter-level differential was measured and dropped as dead code —
+  minute rows in English share no common prefix, and only about six of the 132
+  hourly transitions do, pinning one or two letters.
 - **Iosevka, not Polestar.** The user wanted Polestar's typeface, which is
   Unica77 — a bespoke Lineto commission, not licensable. Iosevka was chosen
   over Inter, Archivo and Hanken Grotesk. Iosevka **Charon** was tried first and
   rejected as too rounded; the plain monospace Iosevka is correct.
 - **Iosevka being monospace is load-bearing.** 0.5em advance makes row widths
   predictable, and means changing letter case never changes layout.
+- **Teens are split on the morpheme, and only one needs a hyphen.** A row holds
+  seven characters at the minute size, so the 8-letter teens are cut into head +
+  "teen" across the two minute rows. "four", "seven", "eight" and "nine" are
+  words, so those read as two fragments the eye joins. "thir" is not a word, so
+  thirteen alone is `thir-`, the mark for a word broken across a line.
 - **Layout derives from live font metrics**, not a fixed pixel grid, so it
   scales across displays. The date is drawn in the margin rather than reserving
   a strip, and the words are centred in whatever space the date leaves: with no
@@ -107,19 +116,26 @@ If the browser is on another machine, run the auth URL there, then
 
 | Setting | Id | Values | Default |
 |---|---|---|---|
-| Theme | 10005 | 0 dark, 1 light | 0 |
-| Time alignment | 10000 | 0 left, 1 centre, 2 right | 0 |
+| Theme | 10006 | 0 dark, 1 light | 0 |
+| Time alignment | 10000 | 0 left, 1 centre, 2 right | 0, centre on round |
 | Date alignment | 10002 | 0 left, 1 centre, 2 right | 1 |
-| Date position | 10003 | 0 hidden, 1 top, 2 bottom | 2 |
-| `oh` minutes | 10004 | 1 "seven oh five", 0 "seven five" | 1 |
-| Font weight | 10007 | 0 Light, 1 Regular | 0 |
+| Date format | 10003 | 0 "Tue 10", 1 "10 Nov", 2 "Tue 10 Nov", 3 "Tuesday" | 0 |
+| Date position | 10004 | 0 hidden, 1 top, 2 bottom | 2 |
+| `oh` minutes | 10005 | 1 "seven oh five", 0 "seven five" | 1 |
+| Font weight | 10008 | 0 Light, 1 Regular | 0 |
 | Letter case | 10001 | 0 lowercase, 1 UPPERCASE, 2 Capital | 0 |
-| Transition | 10006 | 0 none, 1 every row, 2 hour only | 2 |
+| Transition | 10007 | 0 none, 1 every row, 2 hour only | 2 |
+
+Date formats 2 and 3 are compiled out on round platforms (`DATE_FORMAT_MAX` in
+`main.c`): the chord a circle leaves for the date is 8 characters at the top and
+9 at the bottom, so those two forms would be ellipsised. The watch clamps them
+to 0 and the config page hides them via `Pebble.getActiveWatchInfo()`, which is
+synchronous and returns `.platform`.
 
 Persist keys in `main.c` are hand-allocated and do not match the ids above
-(1 theme, 2 align, 4 datepos, 5 oh, 6 datealign, 7 regular, 8 caps, 9 trans).
-Key 3 is a retired TimeFormat and 10/11 are retired DateHold/TapDate — do not
-reuse them.
+(1 theme, 2 align, 4 datepos, 5 oh, 6 datealign, 7 regular, 8 caps, 9 trans,
+12 datefmt). Key 3 is a retired TimeFormat and 10/11 are retired
+DateHold/TapDate — do not reuse them.
 
 ## Gotchas
 
@@ -136,6 +152,16 @@ a font size, run it.
 screens inset 10%, so a round display gives up proportionally more width:
 gabbro's box is 208 of 260, emery's is 188 of 200. A bigger screen does not
 automatically mean more room per character — check the table in `test/run.sh`.
+
+**On a circle, the mask eats the top row's ascenders, not the box's corners.**
+The visible area is a radius-`w/2` circle, so at the height of the hour row's
+ascenders only the middle of the screen exists: on chalk at 48px the ink starts
+at x25 while the circle does not reach x47 until 26px lower. Anything tall at
+the left edge of the top row — `f`, `l`, `t`, `h` — loses its tip when the words
+are left- or right-aligned. Two things answer it: chalk runs 40/34 rather than
+48/40, and round platforms default to centred words. Gabbro is clipped the same
+way in proportion, and gets by on the centred default alone. Emery is a
+rectangle and has none of this.
 
 **Adding a setting renumbers every AppMessage id.** They are assigned
 alphabetically, so inserting one shifts everything after it and any saved
@@ -179,8 +205,12 @@ launcher instead of the face.
 - **Version is `0.1.0`** — bump to `1.0.0` for the first store release.
 - **Screenshots are stale** — the five in `ten-forty/screenshots/` predate the
   clipping fixes. Recapture, ideally 3 per platform (dark, light, another time).
-- **Quick View is untested** — `layer_get_unobstructed_bounds()` is wired up but
-  has never been checked against a real notification.
+- **Quick View reflows, and drops the date** — `layer_get_unobstructed_bounds()`
+  shrinks to the area above a notification (117 of 168px on a Time, 169 of 228
+  on a Time 2), which three rows at their usual leading do not fit into. The
+  rows close up and the date is skipped. Chalk reports no obstruction, so it
+  keeps its normal layout. The ink ratios in `ink_above()`/`ink_below()` are
+  measured, not derived.
 - **No localisation** — the content is English words, so non-English users
   cannot use the face at all. See `IDEAS.md`; this is the biggest unlock.
 - **No 24-hour, no aplite/diorite** (1-bit screens, 24KB heap, would need the

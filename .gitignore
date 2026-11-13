@@ -6,7 +6,7 @@ build/
 baseline/
 
 # Scratch from the design process: candidate fonts and screenshots that were
-# compared but not shipped. Project screenshots live in v2/screenshots/.
+# compared but not shipped. Project screenshots live in ten-forty/screenshots/.
 fonts-src/
 shots/
 

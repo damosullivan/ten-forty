@@ -20,16 +20,23 @@ Deferred by decision, not by accident. Nothing here is started.
   narrowness ever feels too technical.
 - **Optical margins.** Left margin currently a fixed 6px; large words look
   closer to the edge than small ones. Could bias by glyph sidebearing.
-- **Alternate date formats.** Currently "Tue 10". Candidates: "10 Nov",
-  "Tuesday", "Tue 10 Nov".
+- **Alternate date formats.** Done: 0 "Tue 10", 1 "10 Nov", 2 "Tue 10 Nov",
+  3 "Tuesday". 2 and 3 are rectangular-only — a round display leaves the date an
+  8-character chord at the top, so they clamp to 0 there and the config page
+  hides them. Measured, not guessed.
 
 ## Motion
 
 - **Per-row slide direction.** Hour slides down as minutes slide up. Nobody in
   no face in this family has done it; roughly 10 lines.
-- **Differential sliding.** Only slide the letters that actually changed
-  ("seventy" -> "seventy one" moves just the tail). Calmer than re-sliding the
-  whole word. This is what Mongo Time / Reel Time get right.
+- **Differential sliding.** Done, in the form the data allows: a row travels
+  only as far as its own text, so "four" -> "five" is 76px each way instead of
+  clearing the screen twice, and a blank row enters from just past where it
+  lands. Letter-level pinning of the shared prefix was the original idea and was
+  dropped: `words.c` puts the tens and the ones on separate rows, so "seventy" ->
+  "seventy one" already leaves the tens row untouched, and across the whole
+  English set only about six of the 132 hourly transitions share a leading
+  character at all. The measured effect was nothing; the travel is what was felt.
 - **Tunable duration / easing.** Current speed is `abs(x)/3 + 1` at 40ms per
   frame. Rows move together; the old 6/3/0 stagger was removed in favour of
   the hour-only slide.
@@ -54,8 +61,8 @@ Deferred by decision, not by accident. Nothing here is started.
   Bitham fonts, which means a second typographic path in `main.c` of ALWAYS
   selecting between custom and system fonts, and skipping `fonts_unload` for
   system fonts.
-- **Quick View.** `layer_get_unobstructed_bounds()` is wired up but never
-  tested against an actual notification.
+- **Quick View.** Done: the words re-fit into the space above a notification and
+  the date is skipped while it is up.
 - **Config page hosting.** Currently a `data:` URI, which iOS blocks. Needs
   `config.html` hosted and `CONFIG_URL` in `src/pkjs/index.js` pointed at it.
 - **Publishing.** Needs a permanent UUID, 80x80 and 144x144 icons, per-platform
@@ -67,5 +74,7 @@ Deferred by decision, not by accident. Nothing here is started.
 
 The original `coredevices/pebble-apps/sliding-text` calls `make_animation()` on
 every minute tick, creating a new `Animation` and overwriting the pointer
-without destroying the old one. One leaked allocation per minute. Worth filing
-upstream; our version uses a self-cancelling `AppTimer` instead.
+without destroying the old one. One leaked allocation per minute. Filed as
+coredevices/pebble-apps#8 (2026-11-11) — the standalone `coredevices/sliding-text`
+repo has issues disabled and redirects there. Our version uses a self-cancelling
+`AppTimer` instead, so it never allocates per tick.
