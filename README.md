@@ -34,7 +34,8 @@ pebble install --emulator basalt
 build` writes `build/ten-forty.pbw`.
 
 On a watch, turn on **Dev Connection** in the Pebble app and use
-`pebble install --cloudpebble`. There is no store listing yet.
+`pebble install --cloudpebble`. The store listing is
+[Ten Forty](https://apps.repebble.com/719f27f4b48048d080225d6b).
 
 ## Platforms
 
