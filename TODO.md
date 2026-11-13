@@ -27,8 +27,8 @@ Store: https://apps.repebble.com · Dashboard: https://developer.repebble.com/da
 
 ## Blocking
 
-- [ ] **Freeze the UUID.** Currently `6f1c2b40-8a3d-4e57-9c21-7b5e0d4a9f13`.
-      Decide once, then never change it.
+- [x] **Freeze the UUID.** `6f1c2b40-8a3d-4e57-9c21-7b5e0d4a9f13`, unchanged
+      through every build to 1.0.0. It becomes permanent on submission.
 - [x] **Name: Ten Forty.** Applied to `displayName`, README, STORE.md and the
       project directory. Store index checked: free.
 - [x] **Host the config page.** Live at
@@ -49,16 +49,16 @@ Store: https://apps.repebble.com · Dashboard: https://developer.repebble.com/da
 
 ## To do
 
-- [ ] Write the description — one plain-text paragraph.
-- [ ] Bump `version` to `1.0.0` and rebuild.
-- [ ] Capture 3-5 screenshots per platform. Currently one each. Worth showing
-      a different time and the light theme.
-- [ ] Decide on a banner (optional, 720x320).
-- [ ] Decide whether to publish the source (source URL is optional but adds
-      credibility, and we are standing on MIT code).
+- [x] Write the description — one plain-text paragraph, in `STORE.md`.
+- [x] Bump `version` to `1.0.0` and rebuild.
+- [x] Capture 3 screenshots per platform (`--scale 2`, exact display size,
+      unframed): three rows dark, two rows dark, light.
+- [x] Source code URL: `https://github.com/damosullivan/ten-forty` (public).
+- [ ] Decide on a banner (optional, 720x320). Skipped for the first release.
 - [ ] Confirm the settings page from an **iPhone**: the Pebble app has to load
-      the hosted page and hand the values back over `pebblejs://close`. This is
-      the only part of the hosting work that cannot be checked on a desktop.
+      the hosted page and hand the values back over `pebblejs://close`. No
+      iPhone available — shipping on the assumption it works, and the first
+      submission is Unlisted anyway.
 - [ ] Publish as **Unlisted**, install from the store on the real watch,
       confirm settings still work.
 - [ ] Flip to **Listed**.

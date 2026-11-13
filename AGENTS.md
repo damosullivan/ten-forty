@@ -223,10 +223,14 @@ launcher instead of the face.
 ## What is missing
 
 - **Config hosting for iOS** — done, see gotchas. GitHub Pages serves
-  `docs/config.html`; the iPhone path itself still needs a phone to confirm.
-- **Version is `0.1.0`** — bump to `1.0.0` for the first store release.
-- **Screenshots are stale** — the five in `ten-forty/screenshots/` predate the
-  clipping fixes. Recapture, ideally 3 per platform (dark, light, another time).
+  `docs/config.html`; the iPhone path is assumed to work but has never been
+  confirmed on an actual iPhone.
+- **Version is `1.0.0`** — first store release. Numbers and dots only, and no
+  version may be reused.
+- **Screenshots are current** — three per platform in
+  `ten-forty/screenshots/`, `--scale 2`, captured from the 1.0.0 build with
+  settings pushed explicitly (emulator flash carries state between sessions, so
+  a screenshot can otherwise show date-hidden when the default is date-bottom).
 - **Quick View reflows, and drops the date** — `layer_get_unobstructed_bounds()`
   shrinks to the area above a notification (117 of 168px on a Time, 169 of 228
   on a Time 2), which three rows at their usual leading do not fit into. The
