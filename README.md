@@ -25,10 +25,13 @@ one sentence broken over three lines.
 
 ```sh
 cd ten-forty
-./scripts/fetch-fonts.sh   # Iosevka: 24MB, not committed
-pebble build               # -> build/ten-forty.pbw
+./scripts/fetch-fonts.sh
+pebble build
 pebble install --emulator basalt
 ```
+
+`fetch-fonts.sh` pulls Iosevka, which is 24MB and not committed. `pebble
+build` writes `build/ten-forty.pbw`.
 
 On a watch, turn on **Dev Connection** in the Pebble app and use
 `pebble install --cloudpebble`. There is no store listing yet.
