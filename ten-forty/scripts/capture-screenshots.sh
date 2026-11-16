@@ -19,7 +19,10 @@ cd "$(dirname "$0")/.." || exit 1
 
 OUT=screenshots
 VERSION=$(python3 -c 'import json;print(json.load(open("package.json"))["version"])')
+KEYS=build/js/message_keys.json
 mkdir -p "$OUT"
+
+[ -f "$KEYS" ] || { echo "build first: $KEYS is missing" >&2; exit 1; }
 
 say() { echo "[$(date +%H:%M:%S)] $*"; }
 
@@ -53,10 +56,21 @@ assert_three_rows() { # HH:MM:SS
   fi
 }
 
+# Setting ids are assigned alphabetically by the SDK, so read them from the
+# build instead of hardcoding numbers that move whenever a key is added or
+# removed. build/js/message_keys.json is the source of truth.
 settings() { # platform theme align
-  pebble send-app-message --emulator "$1" \
-    --int 10006="$2" 10004=2 10003=0 10000="$3" 10002=1 10005=1 10008=0 10001=0 10007=2 \
-    >/dev/null 2>&1
+  local p=$1 th=$2 al=$3 ids
+  ids=$(python3 - "$th" "$al" "$KEYS" <<'PY'
+import json, sys
+m = json.load(open(sys.argv[3]))
+v = {"Theme": int(sys.argv[1]), "Align": int(sys.argv[2]), "Date": 1,
+     "OhWords": 1, "Weight": 0, "Case": 0, "Transition": 2}
+print(" ".join("%d=%d" % (m[k], v[k]) for k in v))
+PY
+)
+  [ -n "$ids" ] || { say "could not read $KEYS"; return 1; }
+  pebble send-app-message --emulator "$p" --int $ids >/dev/null 2>&1
 }
 
 shot() { # platform time theme align name

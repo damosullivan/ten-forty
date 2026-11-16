@@ -49,18 +49,18 @@ diorite — are not targeted: three custom fonts do not fit in 24KB of heap.
 
 ## Settings
 
-Nine settings. All presentational, all persisted on the watch. The phone page
+Seven settings. All presentational, all persisted on the watch. The phone page
 is at
 [damosullivan.github.io/ten-forty/config.html](https://damosullivan.github.io/ten-forty/config.html).
 
 | Setting | Values |
 |---|---|
 | Theme | white on black, black on white |
-| Alignment | left, centre, right — words and date separately |
-| Date | hidden, top or bottom — `Tue 10` · `10 Nov` · `Tue 10 Nov` · `Tuesday` |
+| Alignment | left, centre or right — one axis for the whole face |
+| Date | hidden, or shown at the bottom as `Tue 10` |
 | Single-digit minutes | `seven oh five` or `seven five` |
 | Font weight | light or regular |
-| Letter case | lowercase, UPPERCASE, Capital |
+| Letter case | lowercase or UPPERCASE |
 | Transition | none, every row, or the hour only |
 
 Only the hour slides by default: it is the one change anyone notices. The

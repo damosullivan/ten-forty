@@ -8,6 +8,30 @@ Deferred by decision, not by accident. Nothing here is started.
   ~30px font and "twenty-three" ~22px, against 37px for normal rows. The only
   options were a jarring size drop or a digit hour. Skipped deliberately.
   Revisit only if the layout changes to allow a 4th row or shorter words.
+- **Multiple date formats.** Removed in 1.1.0. One format, `Tue 10`, at the
+  bottom. The alternatives either lost the weekday, lost the day number, or did
+  not fit the chord a round display leaves at the bottom.
+- **Top date.** Removed in 1.1.0. Reading order puts the date after the time,
+  and the bottom is the wider chord on a circle. The top is also where the
+  hour's ascenders already fight the mask.
+- **Capital letter case.** Removed in 1.1.0. It capitalised the first letter of
+  each row, turning one sentence into three.
+- **Auto day/night.** White-on-black after sunset, black-on-white by day. The
+  idea is clean, but it adds a rule and a failure mode to a face whose theme is
+  already one deliberate choice.
+- **Accent colour on the hour row.** The two-tone face is the reason it reads as
+  Bauhaus; a colour accent would be the first ornament.
+- **Battery dot.** A second information channel, even at 3px below 20%. Steps,
+  weather, heart rate and a Bluetooth icon stay rejected as clutter too.
+
+## Status line / plugins
+
+Not started. The bottom line is designed as a register, not a canvas: one line,
+text only, about nine characters to clear the chord a round display leaves at
+the bottom, fixed size/weight/colour, alignment inherited from the words,
+chord-clamped on round, and the first thing to yield under Quick View. A plugin
+supplies a string, not a layout. When it lands, the `Date` setting becomes
+`Status` / `Bottom line` and the AppMessage keys renumber.
 
 ## Typography
 
@@ -20,10 +44,6 @@ Deferred by decision, not by accident. Nothing here is started.
   narrowness ever feels too technical.
 - **Optical margins.** Left margin currently a fixed 6px; large words look
   closer to the edge than small ones. Could bias by glyph sidebearing.
-- **Alternate date formats.** Done: 0 "Tue 10", 1 "10 Nov", 2 "Tue 10 Nov",
-  3 "Tuesday". 2 and 3 are rectangular-only — a round display leaves the date an
-  8-character chord at the top, so they clamp to 0 there and the config page
-  hides them. Measured, not guessed.
 
 ## Motion
 
@@ -41,18 +61,6 @@ Deferred by decision, not by accident. Nothing here is started.
   frame. Rows move together; the old 6/3/0 stagger was removed in favour of
   the hour-only slide.
 - **Entrance animation on wake.** Currently only on launch.
-
-## Information
-
-- **Battery dot.** 3px in a corner, only below 20%. The only extra info that
-  wouldn't violate the "one or two items, small" rule.
-- Deliberately rejected as clutter: steps, weather, heart rate, Bluetooth icon.
-
-## Theming
-
-- **Automatic day/night.** White-on-black after sunset, black-on-white by day.
-  Zero clutter, one setting. Needs local sunrise/sunset or a fixed hour.
-- **Accent option for the hour row** (one of the 64 Pebble colours).
 
 ## Platform
 

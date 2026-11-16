@@ -1,7 +1,7 @@
 {
   "name": "ten-forty",
   "author": "Damien",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "private": true,
   "keywords": [
     "pebble-app"
@@ -28,9 +28,7 @@
     "messageKeys": [
       "Align",
       "Case",
-      "DateAlign",
-      "DateFormat",
-      "DatePos",
+      "Date",
       "OhWords",
       "Theme",
       "Transition",
@@ -252,5 +250,5 @@
       ]
     }
   },
-  "description": "A text clock for Pebble. Three stacked words set in Iosevka: the hour bold, the minutes light. Optional date, nine typographic settings, no clutter."
+  "description": "A text clock for Pebble. Three stacked words set in Iosevka: the hour bold, the minutes light. Optional date, seven typographic settings, no clutter."
 }

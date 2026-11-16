@@ -9,24 +9,18 @@
 /* A row only travels as far as its own text, plus this much, so a four-letter
  * word does not cross the whole screen to be replaced by another one. */
 #define SLIDE_GAP 4
-/* Ink clearance from the screen edge for the date row. The top value is a box
- * offset that lands the glyphs about 4px in; the bottom is the gap below. */
-#define DATE_EDGE_TOP 3
-#define DATE_EDGE_BOTTOM 5
+/* Gap below the date row. A rectangle can take the date close to the edge; a
+ * circle cannot, because its chord narrows fastest at the bottom. 8px on round
+ * keeps the full "Mon 16" inside the chord with room to spare at every date
+ * size; 5px did not. */
+#define DATE_EDGE_BOTTOM PBL_IF_ROUND_ELSE(8, 5)
 /* Clearance above and below the words when Quick View has taken the bottom of
  * the screen. */
 #define QV_MARGIN 4
 
-/* Date formats are numbered 0 "Tue 10", 1 "10 Nov", 2 "Tue 10 Nov",
- * 3 "Tuesday". The last two need more width than a round display has: the
- * circle leaves the date an 8-character chord at the top and 9 at the bottom,
- * so they are clamped away there rather than silently truncated with an
- * ellipsis. The config page hides the same two options for the same reason. */
-#ifdef PBL_ROUND
-  #define DATE_FORMAT_MAX 1
-#else
-  #define DATE_FORMAT_MAX 3
-#endif
+/* One date format: "Tue 10". It is the widest form that fits the chord a round
+ * display leaves at the bottom (9 characters), and it carries both the weekday
+ * and the day number. The config page no longer needs to know the platform. */
 
 /* ------------------------------------------------------------------- fonts
  * Sizes are picked per screen so each platform fills its width the same way.
@@ -93,15 +87,13 @@ typedef struct {
   int last_minute;
   int last_day;
 
-  uint8_t theme;     /* 0 dark, 1 light */
-  uint8_t align;     /* 0 left, 1 centre, 2 right  -- the three time rows */
-  uint8_t datealign; /* 0 left, 1 centre, 2 right  -- the date row */
-  uint8_t datepos;   /* 0 off, 1 top, 2 bottom */
-  uint8_t oh;        /* 1 = "oh five", 0 = "five" */
-  uint8_t regular;   /* 0 = Iosevka Light, 1 = Iosevka Regular */
-  uint8_t caps;      /* 0 lower, 1 UPPER, 2 Capital */
-  uint8_t trans;     /* 0 none, 1 slide every row, 2 slide the hour only */
-  uint8_t datefmt;   /* 0 "Tue 10", 1 "10 Nov", 2 "Tue 10 Nov", 3 "Tuesday" */
+  uint8_t theme;      /* 0 dark, 1 light */
+  uint8_t align;      /* 0 left, 1 centre, 2 right -- the whole face */
+  uint8_t date_shown; /* 0 off, 1 shown at the bottom */
+  uint8_t oh;         /* 1 = "oh five", 0 = "five" */
+  uint8_t regular;    /* 0 = Iosevka Light, 1 = Iosevka Regular */
+  uint8_t caps;       /* 0 lower, 1 UPPER */
+  uint8_t trans;      /* 0 none, 1 slide every row, 2 slide the hour only */
   char date_text[20];
 } App;
 
@@ -134,17 +126,20 @@ static int16_t height_for(const Row *r) {
 /* ---------------------------------------------------------------- geometry */
 
 /* Integer square root, used to work out how much of the screen a round
- * display actually has at a given row. */
+ * display actually has at a given row. Round-only: the date's chord is the
+ * only thing that needs it. */
+#if defined(PBL_ROUND)
 static int16_t isqrt32(int32_t v) {
   if (v <= 0) return 0;
   int32_t x = v, y = (x + 1) / 2;
   while (y < x) { x = y; y = (x + v / x) / 2; }
   return (int16_t)x;
 }
+#endif
 
 static int16_t margin_x(void) {
-  GRect b = layer_get_bounds(app->canvas);
-  return PBL_IF_ROUND_ELSE((int16_t)(b.size.w * 10 / 100), MARGIN_X);
+  return PBL_IF_ROUND_ELSE(
+      (int16_t)(layer_get_bounds(app->canvas).size.w * 10 / 100), MARGIN_X);
 }
 
 static GRect visible_bounds(void) {
@@ -201,13 +196,10 @@ static int16_t row_baseline(int i) {
   int16_t anchor = (int16_t)(((int32_t)b.size.h * 94) / 168);
 
   /* Centre the words in the space the date leaves, rather than in the whole
-   * screen: a date at the bottom pushes them up, one at the top pushes them
-   * down, and with no date they get the full height. */
-  if (app->datepos == 1) {
-    anchor += (int16_t)((DATE_EDGE_TOP + app->h_date) / 2);
-  } else if (app->datepos == 2) {
-    int16_t dtop = (int16_t)(b.size.h - app->h_date - DATE_EDGE_BOTTOM);
-    anchor -= (int16_t)((b.size.h - dtop) / 2);
+   * screen: the date at the bottom pushes them up by half its strip, and with
+   * no date they get the full height. */
+  if (app->date_shown) {
+    anchor -= (int16_t)((app->h_date + DATE_EDGE_BOTTOM) / 2);
   }
 
   return anchor + (i - 1) * app->pitch;
@@ -215,9 +207,7 @@ static int16_t row_baseline(int i) {
 
 static int16_t date_y(void) {
   GRect b = visible_bounds();
-  return (app->datepos == 1)
-      ? DATE_EDGE_TOP
-      : (int16_t)(b.size.h - app->h_date - DATE_EDGE_BOTTOM);
+  return (int16_t)(b.size.h - app->h_date - DATE_EDGE_BOTTOM);
 }
 
 /* ------------------------------------------------------------------ drawing */
@@ -244,12 +234,18 @@ static void canvas_update(Layer *layer, GContext *ctx) {
 
   /* Quick View leaves no room for the date: it would land on the minute row,
    * and the notification is covering that part of the screen anyway. */
-  if (app->datepos && app->date_text[0] && !obstructed()) {
+  if (app->date_shown && app->date_text[0] && !obstructed()) {
     GRect box = GRect(mx, date_y(), w, app->h_date);
 #if defined(PBL_ROUND)
-    /* Keep the date inside the circle instead of clipping it in the corner. */
+    /* Keep the date inside the circle instead of clipping it in the corner.
+     * Measure the chord at the bottom of the date's ink, not at the middle of
+     * its box: left-aligned text starts at the box edge, and the circle is
+     * narrowest there. 86/100 is the ascender fraction used for the rows; the
+     * extra 2px covers the ink's last row. */
     const int16_t r = b.size.w / 2;
-    int16_t dy = (int16_t)(box.origin.y + app->h_date / 2 - r);
+    int16_t ink_bottom = (int16_t)(box.origin.y +
+                                   ((int32_t)app->h_date * 86) / 100 + 2);
+    int16_t dy = (int16_t)(ink_bottom - r);
     if (dy < 0) dy = (int16_t)-dy;
     int16_t chord = isqrt32((int32_t)r * r - (int32_t)dy * dy);
     if (chord > 12) {
@@ -260,7 +256,7 @@ static void canvas_update(Layer *layer, GContext *ctx) {
     if (box.size.w > 12) {
       graphics_context_set_text_color(ctx, dim_color());
       graphics_draw_text(ctx, app->date_text, app->f_date, box,
-                         GTextOverflowModeFill, to_alignment(app->datealign), NULL);
+                         GTextOverflowModeFill, to_alignment(app->align), NULL);
     }
   }
 }
@@ -368,8 +364,6 @@ static char *to_case(char *s) {
     for (char *p = s; *p; p++) {
       if (*p >= 'a' && *p <= 'z') *p = (char)(*p - 'a' + 'A');
     }
-  } else if (app->caps == 2 && s[0] >= 'a' && s[0] <= 'z') {
-    s[0] = (char)(s[0] - 'a' + 'A');
   }
   return s;
 }
@@ -378,33 +372,9 @@ static void refresh_date(const struct tm *t) {
   static const char *const DAYS[] = {
     "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
   };
-  static const char *const DAYS_LONG[] = {
-    "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
-  };
-  static const char *const MONTHS[] = {
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-  };
-  const int wd = t->tm_wday;
-  const int mon = t->tm_mon;
 
-  switch (app->datefmt) {
-    case 1:
-      snprintf(app->date_text, sizeof(app->date_text), "%d %s",
-               t->tm_mday, MONTHS[mon]);
-      break;
-    case 2:
-      snprintf(app->date_text, sizeof(app->date_text), "%s %d %s",
-               DAYS[wd], t->tm_mday, MONTHS[mon]);
-      break;
-    case 3:
-      snprintf(app->date_text, sizeof(app->date_text), "%s", DAYS_LONG[wd]);
-      break;
-    default:
-      snprintf(app->date_text, sizeof(app->date_text), "%s %d",
-               DAYS[wd], t->tm_mday);
-      break;
-  }
+  snprintf(app->date_text, sizeof(app->date_text), "%s %d",
+           DAYS[t->tm_wday], t->tm_mday);
   to_case(app->date_text);
   app->last_day = t->tm_mday;
 }
@@ -494,12 +464,6 @@ static void apply_weight(void) {
   layer_mark_dirty(app->canvas);
 }
 
-/* A value set on a rectangular watch can outlive a switch to a round one, and
- * the round form is built without the wide formats compiled in above. */
-static uint8_t clamp_datefmt(uint8_t v) {
-  return v > DATE_FORMAT_MAX ? 0 : v;
-}
-
 static void inbox_received(DictionaryIterator *it, void *context) {
   Tuple *t;
   bool dirty = false;
@@ -515,23 +479,13 @@ static void inbox_received(DictionaryIterator *it, void *context) {
     persist_write_int(2, app->align);
     dirty = true;
   }
-  if ((t = dict_find(it, MESSAGE_KEY_DateAlign))) {
-    app->datealign = (uint8_t)t->value->int32;
-    persist_write_int(6, app->datealign);
-    dirty = true;
-  }
-  if ((t = dict_find(it, MESSAGE_KEY_DateFormat))) {
-    app->datefmt = clamp_datefmt((uint8_t)t->value->int32);
-    persist_write_int(12, app->datefmt);
-    dirty = true;
-  }
-  if ((t = dict_find(it, MESSAGE_KEY_DatePos))) {
-    app->datepos = (uint8_t)t->value->int32;
-    persist_write_int(4, app->datepos);
+  if ((t = dict_find(it, MESSAGE_KEY_Date))) {
+    app->date_shown = t->value->int32 ? 1 : 0;
+    persist_write_int(4, app->date_shown);
     dirty = true;
   }
   if ((t = dict_find(it, MESSAGE_KEY_Case))) {
-    app->caps = (uint8_t)t->value->int32;
+    app->caps = t->value->int32 == 1 ? 1 : 0;
     persist_write_int(8, app->caps);
     dirty = true;
   }
@@ -583,9 +537,7 @@ static void send_settings_to_phone(void) {
   }
   dict_write_int8(iter, MESSAGE_KEY_Theme, (int8_t)app->theme);
   dict_write_int8(iter, MESSAGE_KEY_Align, (int8_t)app->align);
-  dict_write_int8(iter, MESSAGE_KEY_DateAlign, (int8_t)app->datealign);
-  dict_write_int8(iter, MESSAGE_KEY_DateFormat, (int8_t)app->datefmt);
-  dict_write_int8(iter, MESSAGE_KEY_DatePos, (int8_t)app->datepos);
+  dict_write_int8(iter, MESSAGE_KEY_Date, (int8_t)app->date_shown);
   dict_write_int8(iter, MESSAGE_KEY_OhWords, (int8_t)app->oh);
   dict_write_int8(iter, MESSAGE_KEY_Weight, (int8_t)app->regular);
   dict_write_int8(iter, MESSAGE_KEY_Case, (int8_t)app->caps);
@@ -627,15 +579,13 @@ static void init(void) {
   app = (App *)malloc(sizeof(App));
   memset(app, 0, sizeof(App));
 
-  app->theme     = persist_exists(1) ? persist_read_int(1) : 0;
-  app->align     = persist_exists(2) ? persist_read_int(2) : PBL_IF_ROUND_ELSE(1, 0);
-  app->datepos   = persist_exists(4) ? persist_read_int(4) : 2;
-  app->oh        = persist_exists(5) ? persist_read_int(5) : 1;
-  app->datealign = persist_exists(6) ? persist_read_int(6) : 1;
-  app->regular   = persist_exists(7) ? persist_read_int(7) : 0;
-  app->caps      = persist_exists(8) ? persist_read_int(8) : 0;
-  app->trans     = persist_exists(9) ? persist_read_int(9) : 2;
-  app->datefmt   = clamp_datefmt(persist_exists(12) ? persist_read_int(12) : 0);
+  app->theme      = persist_exists(1) ? persist_read_int(1) : 0;
+  app->align      = persist_exists(2) ? persist_read_int(2) : PBL_IF_ROUND_ELSE(1, 0);
+  app->date_shown = persist_exists(4) ? (persist_read_int(4) ? 1 : 0) : 1;
+  app->oh         = persist_exists(5) ? persist_read_int(5) : 1;
+  app->regular    = persist_exists(7) ? persist_read_int(7) : 0;
+  app->caps       = (persist_exists(8) && persist_read_int(8) == 1) ? 1 : 0;
+  app->trans      = persist_exists(9) ? persist_read_int(9) : 2;
 
   app->last_hour = -1;
   app->last_minute = -1;

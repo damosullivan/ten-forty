@@ -7,7 +7,7 @@ at the end of the session that built most of it.
 
 **Ten Forty**, a text-clock watchface for Pebble. The time is spelled in three
 stacked words — hour, minute-tens, minute-ones — set in Iosevka, hour bold,
-minutes light. Optional date. Nine settings, all of them presentational.
+minutes light. Optional date at the bottom. Seven settings, all presentational.
 
 Targets basalt, flint, chalk, emery, gabbro. Developed and tested on a Pebble
 Time Steel (basalt) using the real hardware via CloudPebble.
@@ -42,11 +42,11 @@ improvements were considered and deliberately rejected.
   words, so those read as two fragments the eye joins. "thir" is not a word, so
   thirteen alone is `thir-`, the mark for a word broken across a line.
 - **Layout derives from live font metrics**, not a fixed pixel grid, so it
-  scales across displays. The date is drawn in the margin rather than reserving
-  a strip, and the words are centred in whatever space the date leaves: with no
-  date they centre in the full screen, with a date at the bottom they sit
-  higher, with it at the top they sit lower. Changing the date setting
-  therefore shifts the words once, by design.
+  scales across displays. The date is drawn in the bottom margin rather than
+  reserving a strip, and the words are centred in whatever space the date
+  leaves: with no date they centre in the full screen, with the date they sit
+  higher by half its strip. Turning the date off therefore recentres them once,
+  by design.
 - **24-hour mode was removed.** Spelled-out 24h does not fit: "seventeen" needs
   a ~30px font and "twenty-three" ~22px against 37px normally. Do not
   reintroduce it without solving that first.
@@ -124,27 +124,23 @@ If the browser is on another machine, run the auth URL there, then
 
 | Setting | Id | Values | Default |
 |---|---|---|---|
-| Theme | 10006 | 0 dark, 1 light | 0 |
-| Time alignment | 10000 | 0 left, 1 centre, 2 right | 0, centre on round |
-| Date alignment | 10002 | 0 left, 1 centre, 2 right | 1 |
-| Date format | 10003 | 0 "Tue 10", 1 "10 Nov", 2 "Tue 10 Nov", 3 "Tuesday" | 0 |
-| Date position | 10004 | 0 hidden, 1 top, 2 bottom | 2 |
-| `oh` minutes | 10005 | 1 "seven oh five", 0 "seven five" | 1 |
-| Font weight | 10008 | 0 Light, 1 Regular | 0 |
-| Letter case | 10001 | 0 lowercase, 1 UPPERCASE, 2 Capital | 0 |
-| Transition | 10007 | 0 none, 1 every row, 2 hour only | 2 |
+| Theme | 10004 | 0 dark, 1 light | 0 |
+| Alignment | 10000 | 0 left, 1 centre, 2 right | 0, centre on round |
+| Date | 10002 | 0 hidden, 1 bottom | 1 |
+| `oh` minutes | 10003 | 1 "seven oh five", 0 "seven five" | 1 |
+| Font weight | 10006 | 0 Light, 1 Regular | 0 |
+| Letter case | 10001 | 0 lowercase, 1 UPPERCASE | 0 |
+| Transition | 10005 | 0 none, 1 every row, 2 hour only | 2 |
 
-Date formats 2 and 3 are compiled out on round platforms (`DATE_FORMAT_MAX` in
-`main.c`): the chord a circle leaves for the date is 8 characters at the top and
-9 at the bottom, so those two forms would be ellipsised. The watch clamps them
-to 0. The phone reads `Pebble.getActiveWatchInfo().platform` (synchronous) and
-passes `_maxDate` to the page, which hides the two wide formats rather than
-showing them and truncating.
+There is one date format, `Tue 10`, and one position, the bottom. It is the
+widest form that fits the chord a circle leaves at the bottom (9 characters),
+and it carries both the weekday and the day number. **Alignment is one axis for
+the whole face**; the date has no alignment of its own.
 
 Persist keys in `main.c` are hand-allocated and do not match the ids above
-(1 theme, 2 align, 4 datepos, 5 oh, 6 datealign, 7 regular, 8 caps, 9 trans,
-12 datefmt). Key 3 is a retired TimeFormat and 10/11 are retired
-DateHold/TapDate — do not reuse them.
+(1 theme, 2 align, 4 date, 5 oh, 7 regular, 8 caps, 9 trans). Key 4 stores
+0/1 now. Key 3 is a retired TimeFormat, 6 and 12 are retired DateAlign and
+DateFormat, and 10/11 are retired DateHold/TapDate — do not reuse them.
 
 ## Gotchas
 
@@ -197,16 +193,16 @@ with `python3 scripts/make-menu-icon.py`.
 the PNG did not shake it loose, because staleness is keyed to the file, not to
 the entry. If the icon looks wrong after a config change, `pebble clean` first.
 
-**The config page is hosted, and its platform filter runs in the browser.**
+**The config page is hosted, and it is platform-agnostic.**
 iOS refuses to load a `data:` URI in the config webview, so the page is a real
 file served by GitHub Pages: `https://damosullivan.github.io/ten-forty/config.html`,
 which is `CONFIG_URL` in `src/pkjs/index.js`. The phone only opens that URL and
 appends the current settings as a fragment.
 
-The page cannot be built per-platform, because it is static. Instead the phone
-puts `_maxDate` in the fragment and the page removes the date formats the watch
-cannot show, on load. That is why `buildConfigHtml` no longer takes a `maxDate`
-argument anywhere — the choice moved out of the JS bundle and into the page.
+There is one date format and it fits every display, so the page no longer needs
+to know which watch it is talking to and the watch no longer sends its platform.
+If a future setting does need per-platform options, the choice has to travel in
+the fragment again.
 
 `docs/config.html` is generated by `scripts/config-page.js` and committed, since
 Pages serves plain files. **Do not hand-edit it** — `test/run.sh` fails if it
@@ -214,7 +210,10 @@ differs from what the generator produces. After changing any field, label,
 option or the page markup: `node scripts/config-page.js --write`.
 
 Pages caches HTML for about ten minutes, so a change to the page can lag the
-commit that made it.
+commit that made it. `CONFIG_URL` therefore carries a `?v=` query, bumped
+whenever the page changes: a cached old page must not be able to send the
+previous AppMessage ids after a release renumbers them. The page reads only the
+fragment, so the query is free to be a version string.
 
 **Watchfaces cannot see buttons.** Up/Down belong to the timeline, Select to the
 launcher, Back to the system. The only gesture a face receives is an
@@ -232,6 +231,19 @@ push from the JS `ready` handler — that used to silently overwrite the watch.
 pitch, re-measure the top and bottom margins with `shot.sh` or the ink-band
 snippet rather than trusting the number.
 
+Re-measured on basalt for 1.1.0, 11:31: with the date off, top 22px and bottom
+21px; with the date on, top 12px and the date's ink 5px from the bottom, with a
+13px gap between the ones row and the date. The 5px is the caption margin and
+is deliberate: growing it crowds the date against the words.
+
+On round displays the gap is 8px (`DATE_EDGE_BOTTOM` is
+`PBL_IF_ROUND_ELSE(8, 5)`), because the chord narrows fastest at the bottom. At
+5px, a 26px date on gabbro was exactly as wide as the chord and the text layer
+silently ellipsised it to "Mo…"; the chord is also measured at the bottom of the
+date's ink rather than the middle of its box, so a left-aligned date starts
+inside the circle. Both were found by testing left alignment on chalk and
+gabbro, not by reading the code.
+
 **Emulator hygiene.** A stale emulator shows another app, a crash dialog, or
 your app highlighted but not launched. `pebble kill && pebble wipe`, then
 reinstall. Screenshots taken immediately after `pebble install` can catch the
@@ -244,15 +256,16 @@ launcher instead of the face.
 - **Config hosting for iOS** — done, see gotchas. GitHub Pages serves
   `docs/config.html`; the iPhone path is assumed to work but has never been
   confirmed on an actual iPhone.
-- **Version is `1.0.2`** — first store release, then a screenshot-only rebuild.
-  Numbers and dots only, and no version may be reused: every upload needs a
-  fresh one, even when only the screenshots changed.
-- **Screenshots are current** — three per platform in `ten-forty/screenshots/`,
-  captured from the 1.0.2 build by `scripts/capture-screenshots.sh`. The store
-  takes exact display size, so there is no `--scale`: a 2x file is rejected.
-  Settings are pushed explicitly before each shot, because the emulator keeps
-  its flash between sessions and a cold shot can come out date-hidden or in the
-  wrong theme.
+- **Version is `1.1.0`** — first store release, then a screenshot rebuild, then
+  the date/letter-case simplification. Numbers and dots only, and no version may
+  be reused: every upload needs a fresh one, even when only the screenshots
+  changed.
+- **Screenshots are current for 1.1.0** — three per platform in
+  `ten-forty/screenshots/`, captured from the 1.1.0 build by
+  `scripts/capture-screenshots.sh`. The store takes exact display size, so there
+  is no `--scale`: a 2x file is rejected. Settings are pushed explicitly before
+  each shot, because the emulator keeps its flash between sessions and a cold
+  shot can come out date-hidden or in the wrong theme.
 - **Every store screenshot is a three-row time.** Two rows — "ten forty" — is
   the face at its plainest and a listing built from those hides the layout that
   makes it worth installing. `scripts/capture-screenshots.sh` refuses a time
@@ -273,7 +286,7 @@ launcher instead of the face.
 
 1. Settings page is hosted — check it still loads, and that `CONFIG_URL` points
    at the live URL.
-2. Bump `version` to `1.0.0`; rebuild.
+2. Bump `version` to the next fresh number; rebuild.
 3. Recapture screenshots (exact display size, unframed).
 4. `pebble publish`, or the Developer Dashboard at
    developer.repebble.com/dashboard.

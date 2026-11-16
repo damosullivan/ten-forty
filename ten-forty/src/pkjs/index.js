@@ -9,12 +9,12 @@
  * URL fragment so the page opens on the watch's real values.
  */
 
-var CONFIG_URL = 'https://damosullivan.github.io/ten-forty/config.html';
+var CONFIG_URL = 'https://damosullivan.github.io/ten-forty/config.html?v=1.1.0';
 
 /* Mirrors DEFAULT_OPTS in scripts/config-page.js. The watch always sends all
- * nine keys, so this only matters before it has said anything. If you add a
+ * seven keys, so this only matters before it has said anything. If you add a
  * setting, change both. */
-var DEFAULT_OPTS = { Theme: 0, Align: 0, DateAlign: 1, DateFormat: 0, DatePos: 2, OhWords: 1, Weight: 0, Case: 0, Transition: 2 };
+var DEFAULT_OPTS = { Theme: 0, Align: 0, Date: 1, OhWords: 1, Weight: 0, Case: 0, Transition: 2 };
 
 function loadOpts() {
   try {
@@ -60,29 +60,14 @@ Pebble.addEventListener('appmessage', function (e) {
   if (changed) saveOpts(opts);
 });
 
-/* A round display gives the date a narrow chord at the top, so the two wide
- * formats are withheld there rather than shown and truncated. Any failure
- * offers all of them and lets the watch clamp. */
-function maxDateFormat() {
-  try {
-    var info = Pebble.getActiveWatchInfo();
-    var p = (info && info.platform) || '';
-    if (p === 'chalk' || p === 'gabbro') return 1;
-  } catch (e) { /* not connected, or an app without the call */ }
-  return 3;
-}
-
+/* The page is platform-agnostic: there is one date format and it fits every
+ * display, so the watch no longer sends its platform. */
 Pebble.addEventListener('showConfiguration', function () {
   var opts = loadOpts();
 
-  var payload = JSON.parse(JSON.stringify(opts));
-  /* the page is static, so the watch's platform has to travel with the
-   * settings: it decides which date formats are worth offering */
-  payload._maxDate = maxDateFormat();
-
   /* the '#' must stay outside the encoded payload, otherwise the settings
    * JSON becomes part of the document instead of the fragment */
-  Pebble.openURL(CONFIG_URL + '#' + encodeURIComponent(JSON.stringify(payload)));
+  Pebble.openURL(CONFIG_URL + '#' + encodeURIComponent(JSON.stringify(opts)));
 });
 
 Pebble.addEventListener('webviewclosed', function (e) {
