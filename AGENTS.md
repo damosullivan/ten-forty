@@ -10,8 +10,8 @@ project, built and published from its own directory:
 
 - `ten-forty/` — the text clock. Custom Iosevka fonts, seven settings, a hosted
   settings page and a phone-side bundle.
-- `bauhaus/` — a spec and concept sheet for a vector instrument dial. Not built
-  yet.
+- `bauhaus/` — the instrument dial. Pure vectors, the system font, no settings,
+  seven platforms including the 1-bit screens.
 
 The repo does not give Pebble a workspace: `pebble build` still runs inside one
 project directory. The repo shares the context, not the build system.
@@ -29,7 +29,7 @@ project directory. The repo shares the context, not the build system.
 │   ├── .nojekyll
 │   └── ten-forty/config.html
 ├── ten-forty/             the text clock (full Pebble project)
-├── bauhaus/               spec, reference images; project to be added
+├── bauhaus/               the instrument dial (full Pebble project)
 ├── baseline/              upstream clone (gitignored)
 ├── fonts-src/             candidate fonts (gitignored)
 └── shots/                 design screenshots (gitignored)
@@ -162,4 +162,5 @@ on the watch; until then, only the code in this repo knows the new path.
 ## Face-specific notes
 
 The face-specific design history, settings ids, persist keys and measured
-layout live in `ten-forty/AGENTS.md`. Do not duplicate them here.
+layout live in `ten-forty/AGENTS.md`; Bauhaus's measured geometry and drawing
+notes live in `bauhaus/AGENTS.md`. Do not duplicate them here.

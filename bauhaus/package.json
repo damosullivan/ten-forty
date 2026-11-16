@@ -1,0 +1,39 @@
+{
+  "name": "bauhaus",
+  "author": "Damien",
+  "version": "1.0.0",
+  "private": true,
+  "keywords": [
+    "pebble-app"
+  ],
+  "dependencies": {},
+  "pebble": {
+    "displayName": "Bauhaus",
+    "uuid": "93c8b851-8d18-4fbf-8050-a6efb9c1023f",
+    "sdkVersion": "3",
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery",
+      "flint",
+      "gabbro"
+    ],
+    "capabilities": [],
+    "watchapp": {
+      "watchface": true
+    },
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "MENU_ICON",
+          "file": "images/menu-icon.png",
+          "menuIcon": true
+        }
+      ]
+    }
+  },
+  "description": "A quiet instrument dial for Pebble: a white dial, a thin black ring, baton hands and a black date window at 3. Drawn from vector primitives and the system font, with no second hand and no settings."
+}

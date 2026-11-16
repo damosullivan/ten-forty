@@ -4,7 +4,7 @@ Watch faces for Pebble. One repo, shared tooling, one face per directory.
 
 <p align="center">
   <img src="ten-forty/images/basalt.png" height="150" alt="Ten Forty">
-  <img src="bauhaus/reference/hero.png" height="150" alt="Bauhaus concept">
+  <img src="bauhaus/images/basalt.png" height="150" alt="Bauhaus">
 </p>
 
 - **[Ten Forty](ten-forty/)** — the time, spelled in three stacked words.
@@ -12,8 +12,8 @@ Watch faces for Pebble. One repo, shared tooling, one face per directory.
   [Build and settings](ten-forty/DEVELOPING.md) ·
   [Design notes](ten-forty/AGENTS.md)
 - **[Bauhaus](bauhaus/)** — a quiet instrument dial built from the watch's own
-  primitives. [Spec](bauhaus/SPEC.md) · [Concept sheet](bauhaus/reference/sheet.png).
-  Spec first; not built yet.
+  primitives. [Build](bauhaus/README.md) · [Spec](bauhaus/SPEC.md) ·
+  [Design notes](bauhaus/AGENTS.md) · [Store copy](bauhaus/STORE.md).
 
 ## Build
 
