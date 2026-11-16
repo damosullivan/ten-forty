@@ -81,6 +81,7 @@ in `ten-forty/STORE.md`.
     ├── test/            host-side word tests
     ├── scripts/fetch-fonts.sh
     ├── scripts/config-page.js  generates docs/config.html
+    ├── scripts/capture-screenshots.sh  the store screenshots
     ├── scripts/make-menu-icon.py  regenerates the launcher icon
     ├── resources/fonts/ TTFs NOT committed — see Gotchas
     ├── resources/images/menu-icon.png  25x25 launcher icon, committed
@@ -243,12 +244,20 @@ launcher instead of the face.
 - **Config hosting for iOS** — done, see gotchas. GitHub Pages serves
   `docs/config.html`; the iPhone path is assumed to work but has never been
   confirmed on an actual iPhone.
-- **Version is `1.0.0`** — first store release. Numbers and dots only, and no
-  version may be reused.
-- **Screenshots are current** — three per platform in
-  `ten-forty/screenshots/`, `--scale 2`, captured from the 1.0.0 build with
-  settings pushed explicitly (emulator flash carries state between sessions, so
-  a screenshot can otherwise show date-hidden when the default is date-bottom).
+- **Version is `1.0.2`** — first store release, then a screenshot-only rebuild.
+  Numbers and dots only, and no version may be reused: every upload needs a
+  fresh one, even when only the screenshots changed.
+- **Screenshots are current** — three per platform in `ten-forty/screenshots/`,
+  captured from the 1.0.2 build by `scripts/capture-screenshots.sh`. The store
+  takes exact display size, so there is no `--scale`: a 2x file is rejected.
+  Settings are pushed explicitly before each shot, because the emulator keeps
+  its flash between sessions and a cold shot can come out date-hidden or in the
+  wrong theme.
+- **Every store screenshot is a three-row time.** Two rows — "ten forty" — is
+  the face at its plainest and a listing built from those hides the layout that
+  makes it worth installing. `scripts/capture-screenshots.sh` refuses a time
+  whose minutes have no ones word, checking it by compiling `src/c/words.c`
+  rather than restating the rule.
 - **Quick View reflows, and drops the date** — `layer_get_unobstructed_bounds()`
   shrinks to the area above a notification (117 of 168px on a Time, 169 of 228
   on a Time 2), which three rows at their usual leading do not fit into. The

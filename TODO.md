@@ -18,8 +18,9 @@ Store: https://apps.repebble.com · Dashboard: https://developer.repebble.com/da
   may be reused. First release should be `1.0.0`.
 - PBW limit 4.4 MB (we are 198 KB). Each image also 4.4 MB.
 - Screenshots: exact platform display size, **unframed** (no watch outline),
-  up to 5 per platform. `pebble screenshot --all-platforms` already writes
-  correctly sized, correctly named files to `screenshots/`.
+  up to 5 per platform, and **always a three-row time** — two rows undersells
+  the face. `scripts/capture-screenshots.sh` does the capture and enforces the
+  row count.
 - Banner 720x320 optional. **Store icons are watchapp-only** — a watchface needs
   none, and the listing's are generated from the name. The icon beside the name
   in the watch's own watchfaces list is a separate thing: a 25x25 bitmap
