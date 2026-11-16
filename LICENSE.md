@@ -1,20 +1,19 @@
 # Licence
 
-Ten Forty, Copyright (c) 2026 Damien O'Sullivan.
+The code in this repository is Copyright (c) 2026 Damien O'Sullivan and is
+licensed under the MIT License below.
 
-This watchface is a derivative work: the word-splitting and slide-animation
-approach comes from Pebble's `sliding-text` example watchface, Copyright (c)
-2015 Pebble Examples, used under the MIT License below. The original lives at
-https://github.com/coredevices/pebble-apps/tree/main/sliding-text
-
-This notice is a legal requirement of the MIT License and travels with the
-code. It is the only place the upstream project is named.
+Ten Forty has additional upstream attribution in
+[ten-forty/LICENSE.md](ten-forty/LICENSE.md): its word-splitting and slide
+approach comes from Pebble's `sliding-text` example, and its bundled Iosevka
+font is under the SIL Open Font License 1.1. Those notices travel with that
+face.
 
 ---
 
 The MIT License (MIT)
 
-Copyright (c) 2015 Pebble Examples
+Copyright (c) 2026 Damien O'Sullivan
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,11 +32,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-## Bundled fonts
-
-Iosevka, Copyright (c) 2015-2026 Renzhi Li (Belleve Invis), licensed under
-the SIL Open Font License 1.1. The full text is in
-`ten-forty/resources/fonts/OFL.txt`.

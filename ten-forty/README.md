@@ -1,137 +1,93 @@
-# Ten Forty
+<h1 align="center">Ten Forty</h1>
 
-A text clock for Pebble: three stacked words spell the time, set in Iosevka
-with a baseline grid that fills the screen.
+<p align="center"><em>The time, spelled. Three stacked words in Iosevka —<br>
+the hour bold, the minutes light.</em></p>
+
+<p align="center">
+  <img src="images/basalt.png" height="150" alt="Ten Forty on a Pebble Time: eleven, thirty, one">
+  <img src="images/basalt-light.png" height="150" alt="Light theme: ten, forty">
+  <img src="images/chalk.png" height="150" alt="Ten Forty on a Pebble Time Round: one o'clock">
+</p>
+
+---
+
+Ten Forty is a watchface for Pebble. No digits, no hands, no ticks, no
+complications: `ten` / `forty`, and nothing else unless you ask it for the
+date. Two rows at ten forty. Three at eleven thirty-one. That is the whole
+face.
+
+It is set in [Iosevka](https://github.com/be5invis/Iosevka), monospaced, so a
+row is exactly as wide as its letters and changing case never moves anything.
+The hour carries the weight; the minutes are light, and the eye reads them as
+one sentence broken over three lines.
 
 ## Build
 
+From this directory (or `cd ten-forty` from the repo root):
+
 ```sh
+./scripts/fetch-fonts.sh
 pebble build
 pebble install --emulator basalt
-pebble screenshot --no-open --emulator basalt shot.png
 ```
 
-Output: `build/ten-forty.pbw`
+`fetch-fonts.sh` pulls Iosevka, which is 24MB and not committed. `pebble
+build` writes `build/ten-forty.pbw`.
 
-On a real watch: enable *Dev Connection* in the Pebble app (Devices -> your
-watch -> three dots), then `pebble login` and `pebble install --cloudpebble`.
-
-## Settings
-
-Seven options, persisted on the watch. Configurable from the phone config page,
-or by `pebble send-app-message --int <key>=<value>`.
-
-| Setting      | Id    | Values                                  | Default |
-|--------------|-------|-----------------------------------------|---------|
-| Theme        | 10004 | 0 white-on-black, 1 black-on-white      | 0       |
-| Alignment    | 10000 | 0 left, 1 centre, 2 right               | 0       |
-| Date         | 10002 | 0 hidden, 1 bottom                      | 1       |
-| `oh` minutes | 10003 | 1 "seven oh five", 0 "seven five"       | 1       |
-| Font weight  | 10006 | 0 Light, 1 Regular                      | 0       |
-| Letter case  | 10001 | 0 lowercase, 1 UPPERCASE                | 0       |
-| Transition   | 10005 | 0 none, 1 slide the hour only           | 1       |
-
-Ids are assigned alphabetically by the SDK, so adding a setting renumbers
-them. `build/js/message_keys.json` is the source of truth. For example:
-
-```sh
-pebble send-app-message --emulator basalt --int 10006=1   # Regular weight
-```
-
-There is one date format, `Tue 10`, and one place for it: the bottom. That is
-the widest form that fits the chord a round display leaves at the bottom, and
-it carries both the weekday and the day number. Alignment is a single setting
-for the whole face — the date sits on the same axis as the words.
-
-Transition defaults to **slide the hour only**: the minute rows cut instantly,
-so the face is still almost all of the time, and the one change you would
-notice -- the hour turning over -- gets the animation. The hour row travels only
-as far as its own text, never the width of the screen: "four" -> "five" moves
-76px rather than sweeping the display. `No animation` cuts instead.
-
-Case is applied to all three rows together. The date follows the setting:
-"Mon 16" in lowercase (the abbreviation keeps its capital), "MON 16" in
-UPPERCASE. It is one setting by design: the rows are a single sentence split
-across lines, and the hour is already distinguished by weight and size. Capital
-was removed because it capitalised the first letter of each row, turning one
-sentence into three.
-
-The watch owns the settings. It persists them and pushes them to the phone on
-launch, so the config page opens showing the real values. The phone never
-pushes on startup -- only when you press Save.
-
-## Tests
-
-The word generator has a host-side test, no watch or SDK needed:
-
-```sh
-ten-forty/test/run.sh
-```
-
-It checks that no row can exceed seven characters (the width the minute font
-allows) across all 60 minutes and all 12 hours. Eight characters is silently
-clipped by the text layer, which is how "thirteen" once rendered as "thirt...".
-
-The same script also fails if `docs/config.html` has drifted from
-`scripts/config-page.js`, which is what generates it. Regenerate with
-`node scripts/config-page.js --write`.
+On a watch, turn on **Dev Connection** in the Pebble app and use
+`pebble install --cloudpebble`. The store listing is
+[Ten Forty](https://apps.repebble.com/719f27f4b48048d080225d6b).
 
 ## Platforms
 
-Targets basalt, flint, chalk, emery and gabbro. Aplite and diorite are excluded:
-1-bit screens plus a 24KB heap make three custom fonts impractical there — they
-would need the system fonts instead.
+Basalt, flint, chalk, emery and gabbro. The 1-bit screens — aplite and
+diorite — are not targeted: three custom fonts do not fit in 24KB of heap.
 
-Font sizes are picked per display so every platform fills its width the same
-way:
+<p align="center">
+  <img src="images/emery.png" height="130" alt="Ten Forty on a Pebble 2">
+  <img src="images/gabbro.png" height="130" alt="Ten Forty on a Pebble Time 2">
+</p>
 
-| Platform        | Screen   | Hour | Minutes | Date |
-|-----------------|----------|------|---------|------|
-| basalt, flint   | 144x168  | 44   | 36      | 16   |
-| chalk           | 180x180  | 40   | 34      | 17   |
-| emery           | 200x228  | 61   | 51      | 22   |
-| gabbro          | 260x260  | 68   | 58      | 26   |
+## Settings
 
-Chalk runs smaller than its 180px suggests. The display is a circle, and the
-chord at the top row's ascender height is much narrower than the screen is
-wide: at 48px the mask cut into the first glyph, and "four" lost most of its
-`f`. At 40/34 the ink sits low enough to clear it.
+Seven settings. All presentational, all persisted on the watch. The phone page
+is at
+[damosullivan.github.io/pebble/ten-forty/config.html](https://damosullivan.github.io/pebble/ten-forty/config.html).
 
-## Layout
+| Setting | Values |
+|---|---|
+| Theme | white on black, black on white |
+| Alignment | left, centre or right — one axis for the whole face |
+| Date | hidden, or shown at the bottom as `Tue 10` |
+| Single-digit minutes | `seven oh five` or `seven five` |
+| Font weight | light or regular |
+| Letter case | lowercase or UPPERCASE |
+| Transition | none, or the hour only |
 
-Rows are placed on a baseline grid: `anchor = 94 * screen_height / 168`, pitch
-`= 1.07 * hour_size`, so the stack scales with the display. The date is drawn in
-the margin rather than reserving a strip, which is how the upstream face wasted
-~38px at the bottom. The words centre in whatever space the date leaves, so
-turning the date off recentres them -- a one-off shift when the setting
-changes, not something that happens while you are looking at it.
+The hour slides: it is the one change anyone notices. The minute rows cut
+instantly; `No animation` cuts the hour too.
 
-Animation is a self-cancelling 40ms `AppTimer` that only runs while rows are
-moving, then stops. Nothing ticks between minutes.
+## Notes
 
-## Fonts
+**Thirteen takes a hyphen.** A row holds seven characters at the minute size,
+so the eight-letter teens are cut across the two minute rows. *four*, *seven*,
+*eight* and *nine* read as two fragments the eye joins by itself. *thir* does
+not, so thirteen alone is `thir-` — the mark for a word broken across a line.
 
-Iosevka (Bold for the hour, Light for the minutes and date; Regular optional).
-SIL Open Font License 1.1 — see `resources/fonts/OFL.txt`.
-Upstream Iosevka: https://github.com/be5invis/Iosevka
+**The circle is the reason chalk runs smaller.** The top row's ascenders sit
+where a round screen is narrowest, so anything tall at the left edge loses its
+tip. Round platforms therefore set smaller type, and centre the words by
+default.
 
-The TTFs are **not committed** (three weights of the full build are 24 MB).
-After a fresh clone, fetch them before building:
+**There is no 24-hour mode.** Spelled out it does not fit: *seventeen* wants a
+30px font and *twenty-three* a 22px one, against 37px normally. It would need
+a different idea, not a setting.
 
-```sh
-ten-forty/scripts/fetch-fonts.sh
-```
+More in [AGENTS.md](AGENTS.md): the design decisions, the gotchas, and the
+things that were tried and removed. Store copy is in [STORE.md](STORE.md).
 
-## Caveats
+## Licence
 
-- The settings page is served from GitHub Pages, at
-  `https://damosullivan.github.io/ten-forty/config.html`, and opened by the
-  phone as an https URL. It cannot be a `data:` URI: iOS refuses to load one,
-  which leaves iPhone users with a settings button that does nothing. The page
-  is generated into `docs/config.html` and committed; see `scripts/config-page.js`.
-- Quick View reflows the words into the space a notification leaves and drops
-  the date while it is up. Round screens report no obstruction, so they keep
-  their normal layout.
-- UUID is frozen for the first release (`6f1c2b40-8a3d-4e57-9c21-7b5e0d4a9f13`).
-  It is permanent: it is how a new release is matched to the existing listing,
-  and it cannot be changed after submission.
+MIT. The word-splitting and slide approach comes from Pebble's `sliding-text`
+example; the notice is in [LICENSE.md](LICENSE.md) and travels with the code.
+Iosevka is under the SIL Open Font License 1.1.

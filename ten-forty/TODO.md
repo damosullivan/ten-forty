@@ -2,7 +2,7 @@
 
 Parked 2026-11-11. Nothing here is started. Research done, decisions open.
 
-Current build: `ten-forty/`, 198 KB pbw, five platforms, SDK 4.44.
+Current build: 1.1.2 (unreleased), ~196 KB pbw, five platforms, SDK 4.44.
 Store: https://apps.repebble.com · Dashboard: https://developer.repebble.com/dashboard
 
 ## Facts worth keeping
@@ -38,7 +38,10 @@ Store: https://apps.repebble.com · Dashboard: https://developer.repebble.com/da
       `https://damosullivan.github.io/ten-forty/config.html` (GitHub Pages,
       `main` / `/docs`). The phone opens that https URL; `CONFIG_URL` in
       `src/pkjs/index.js` points at it. Regenerate with
-      `node scripts/config-page.js --write` whenever a setting changes.
+      `node scripts/config-page.js --write` whenever a setting changes. The
+      monorepo move changes this to
+      `https://damosullivan.github.io/pebble/ten-forty/config.html`; 1.1.2
+      carries the new URL.
 - [x] **MIT attribution.** Done: `LICENSE.md` carries the upstream MIT notice
       and the font licence pointer. It is the only file that names the upstream
       project; the README and store copy do not.
@@ -54,9 +57,13 @@ Store: https://apps.repebble.com · Dashboard: https://developer.repebble.com/da
 
 - [x] Write the description — one plain-text paragraph, in `STORE.md`.
 - [x] Bump `version` to `1.0.0` and rebuild.
+- [x] Shipped 1.0.0, 1.1.0 and 1.1.1.
+- [ ] Publish 1.1.2 with the new `/pebble/ten-forty/` settings URL and the
+      monorepo source URL.
 - [x] Capture 3 screenshots per platform (`--scale 2`, exact display size,
       unframed): three rows dark, two rows dark, light.
 - [x] Source code URL: `https://github.com/damosullivan/ten-forty` (public).
+      After the repo rename: `https://github.com/damosullivan/pebble/tree/main/ten-forty`.
 - [ ] Decide on a banner (optional, 720x320). Skipped for the first release.
 - [ ] Confirm the settings page from an **iPhone**: the Pebble app has to load
       the hosted page and hand the values back over `pebblejs://close`. No

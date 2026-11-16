@@ -1,18 +1,17 @@
 # Build output
-ten-forty/build/
-build/
+**/build/
+**/*.pbw
 
-# Upstream reference clone (keeps its own git history; see README for the URL)
+# Upstream reference clone (keeps its own git history)
 baseline/
 
-# Scratch from the design process: candidate fonts and screenshots that were
-# compared but not shipped. Project screenshots live in ten-forty/screenshots/.
+# Scratch from the design process
 fonts-src/
 shots/
 
 # waf build lock
-.lock-waf*
-ten-forty/.lock-waf*
+**/.lock-waf*
+**/.wafpickle-*
 
 # Fonts are fetched, not committed: three Iosevka weights are 24 MB.
 # Run ten-forty/scripts/fetch-fonts.sh after cloning.

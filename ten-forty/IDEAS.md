@@ -72,7 +72,7 @@ supplies a string, not a layout. When it lands, the `Date` setting becomes
   system fonts.
 - **Quick View.** Done: the words re-fit into the space above a notification and
   the date is skipped while it is up.
-- **Config page hosting.** Done: GitHub Pages serves `docs/config.html`, and
+- **Config page hosting.** Done: GitHub Pages serves `../docs/ten-forty/config.html`, and
   `CONFIG_URL` in `src/pkjs/index.js` points at it. iOS blocks `data:` URIs,
   which is what made this necessary rather than tidy.
 - **Publishing.** Needs a permanent UUID, 80x80 and 144x144 icons, per-platform

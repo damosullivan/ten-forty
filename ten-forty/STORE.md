@@ -28,8 +28,8 @@ Round 2.
 |---|---|
 | Type | Watchface (from `watchapp.watchface` in the pbw — cannot be changed later) |
 | Category | Not required for watchfaces; filed under *Faces* |
-| Version | `1.1.1` |
-| Release notes | The hour is the only row that slides now. |
+| Version | `1.1.2` |
+| Release notes | Move the settings page to the new repository path. |
 | Source code URL | https://github.com/damosullivan/ten-forty |
 | Website URL | Optional |
 | Visibility | Unlisted for the first submission, then Listed |

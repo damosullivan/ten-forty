@@ -1,13 +1,14 @@
 #!/usr/bin/env node
-/* Renders the settings page that the phone opens, to docs/config.html.
+/* Renders the settings page that the phone opens, to
+ * docs/ten-forty/config.html.
  *
  *   node scripts/config-page.js --write   # regenerate after changing a field
- *   node scripts/config-page.js --check   # fail if docs/config.html is stale
+ *   node scripts/config-page.js --check   # fail if the page is stale
  *
  * The output is committed because GitHub Pages serves it as a plain file:
- * https://damosullivan.github.io/ten-forty/config.html, which is the URL in
- * CONFIG_URL. iOS refuses to load a data: URI in the config webview, so this
- * file is not optional — it is how iPhone users reach their settings.
+ * https://damosullivan.github.io/pebble/ten-forty/config.html, which is the
+ * URL in CONFIG_URL. iOS refuses to load a data: URI in the config webview, so
+ * this file is not optional — it is how iPhone users reach their settings.
  *
  * Nothing here reaches the watch bundle. The phone side (src/pkjs/index.js)
  * only opens this URL and appends the current settings as a fragment.
@@ -21,7 +22,7 @@
 var fs = require('fs');
 var path = require('path');
 
-var OUT = path.join(__dirname, '..', '..', 'docs', 'config.html');
+var OUT = path.join(__dirname, '..', '..', 'docs', 'ten-forty', 'config.html');
 
 /* Mirrors DEFAULT_OPTS in src/pkjs/index.js. The watch always sends all seven
  * keys, so this only matters for the page opened directly by hand. If you add
@@ -103,7 +104,7 @@ if (mode === '--write') {
   var current = null;
   try { current = fs.readFileSync(OUT, 'utf8'); } catch (e) { /* missing counts as stale */ }
   if (current !== html) {
-    console.error('docs/config.html is out of date with scripts/config-page.js');
+    console.error('../docs/ten-forty/config.html is out of date with scripts/config-page.js');
     console.error('run: node scripts/config-page.js --write');
     process.exit(1);
   }
