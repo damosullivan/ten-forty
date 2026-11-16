@@ -23,13 +23,15 @@ improvements were considered and deliberately rejected.
   and is a legal requirement — do not remove it.
 - **Renamed to Ten Forty.** The word "Sliding" described the genre it was forked
   from, not what it is. The face is a text clock.
-- **Sliding is now a transition, not the identity.** It defaults to sliding the
-  *hour row only*, because that is the one change anyone notices. Options are
-  none / every row / hour only. A row travels only as far as its own text
-  (`w + SLIDE_GAP`), not the screen width, so "every row" moves by the width of
-  a word; letter-level differential was measured and dropped as dead code —
-  minute rows in English share no common prefix, and only about six of the 132
-  hourly transitions do, pinning one or two letters.
+- **Sliding is now a transition, not the identity.** It slides the *hour row
+  only*, because that is the one change anyone notices; options are
+  none / hour only. The hour travels only as far as its own text
+  (`w + SLIDE_GAP`), not the screen width, so it moves by the width of a word.
+  Letter-level differential was measured and dropped as dead code — minute rows
+  in English share no common prefix, and only about six of the 132 hourly
+  transitions do, pinning one or two letters. "Slide every row" was removed in
+  1.1.1: giving the minutes the same motion flattened the hour's hierarchy and
+  made the face kinetic every minute.
 - **Iosevka, not Polestar.** The user wanted Polestar's typeface, which is
   Unica77 — a bespoke Lineto commission, not licensable. Iosevka was chosen
   over Inter, Archivo and Hanken Grotesk. Iosevka **Charon** was tried first and
@@ -130,7 +132,7 @@ If the browser is on another machine, run the auth URL there, then
 | `oh` minutes | 10003 | 1 "seven oh five", 0 "seven five" | 1 |
 | Font weight | 10006 | 0 Light, 1 Regular | 0 |
 | Letter case | 10001 | 0 lowercase, 1 UPPERCASE | 0 |
-| Transition | 10005 | 0 none, 1 every row, 2 hour only | 2 |
+| Transition | 10005 | 0 none, 1 hour only | 1 |
 
 There is one date format, `Tue 10`, and one position, the bottom. It is the
 widest form that fits the chord a circle leaves at the bottom (9 characters),
@@ -139,7 +141,8 @@ the whole face**; the date has no alignment of its own.
 
 Persist keys in `main.c` are hand-allocated and do not match the ids above
 (1 theme, 2 align, 4 date, 5 oh, 7 regular, 8 caps, 9 trans). Key 4 stores
-0/1 now. Key 3 is a retired TimeFormat, 6 and 12 are retired DateAlign and
+0/1 now. Key 9 stores 0/1 too; an old every-row or hour-only value both become
+hour-only. Key 3 is a retired TimeFormat, 6 and 12 are retired DateAlign and
 DateFormat, and 10/11 are retired DateHold/TapDate — do not reuse them.
 
 ## Gotchas
@@ -231,7 +234,7 @@ push from the JS `ready` handler — that used to silently overwrite the watch.
 pitch, re-measure the top and bottom margins with `shot.sh` or the ink-band
 snippet rather than trusting the number.
 
-Re-measured on basalt for 1.1.0, 11:31: with the date off, top 22px and bottom
+Re-measured on basalt for 1.1.x, 11:31: with the date off, top 22px and bottom
 21px; with the date on, top 12px and the date's ink 5px from the bottom, with a
 13px gap between the ones row and the date. The 5px is the caption margin and
 is deliberate: growing it crowds the date against the words.
@@ -256,12 +259,12 @@ launcher instead of the face.
 - **Config hosting for iOS** — done, see gotchas. GitHub Pages serves
   `docs/config.html`; the iPhone path is assumed to work but has never been
   confirmed on an actual iPhone.
-- **Version is `1.1.0`** — first store release, then a screenshot rebuild, then
-  the date/letter-case simplification. Numbers and dots only, and no version may
-  be reused: every upload needs a fresh one, even when only the screenshots
-  changed.
-- **Screenshots are current for 1.1.0** — three per platform in
-  `ten-forty/screenshots/`, captured from the 1.1.0 build by
+- **Version is `1.1.1`** — first store release, then a screenshot rebuild, then
+  the date/letter-case simplification, then the every-row removal. Numbers and
+  dots only, and no version may be reused: every upload needs a fresh one, even
+  when only the screenshots changed.
+- **Screenshots are current for 1.1.1** — three per platform in
+  `ten-forty/screenshots/`, captured from the 1.1.1 build by
   `scripts/capture-screenshots.sh`. The store takes exact display size, so there
   is no `--scale`: a 2x file is rejected. Settings are pushed explicitly before
   each shot, because the emulator keeps its flash between sessions and a cold

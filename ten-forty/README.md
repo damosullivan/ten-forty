@@ -29,7 +29,7 @@ or by `pebble send-app-message --int <key>=<value>`.
 | `oh` minutes | 10003 | 1 "seven oh five", 0 "seven five"       | 1       |
 | Font weight  | 10006 | 0 Light, 1 Regular                      | 0       |
 | Letter case  | 10001 | 0 lowercase, 1 UPPERCASE                | 0       |
-| Transition   | 10005 | 0 none, 1 slide every row, 2 hour only  | 2       |
+| Transition   | 10005 | 0 none, 1 slide the hour only           | 1       |
 
 Ids are assigned alphabetically by the SDK, so adding a setting renumbers
 them. `build/js/message_keys.json` is the source of truth. For example:
@@ -45,13 +45,9 @@ for the whole face — the date sits on the same axis as the words.
 
 Transition defaults to **slide the hour only**: the minute rows cut instantly,
 so the face is still almost all of the time, and the one change you would
-notice -- the hour turning over -- gets the animation.
-
-A row slides only as far as its own text, never the width of the screen:
-replacing "four" with "five" moves each word by 76px instead of clearing 132px
-twice, and a row that was empty comes in from just past where it lands. That is
-what makes "slide every row" usable -- the minute rows move by the width of a
-word rather than sweeping the display.
+notice -- the hour turning over -- gets the animation. The hour row travels only
+as far as its own text, never the width of the screen: "four" -> "five" moves
+76px rather than sweeping the display. `No animation` cuts instead.
 
 Case is applied to all three rows together. The date follows the setting:
 "Mon 16" in lowercase (the abbreviation keeps its capital), "MON 16" in

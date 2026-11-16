@@ -16,6 +16,9 @@ Deferred by decision, not by accident. Nothing here is started.
   hour's ascenders already fight the mask.
 - **Capital letter case.** Removed in 1.1.0. It capitalised the first letter of
   each row, turning one sentence into three.
+- **Slide every row.** Removed in 1.1.1. Giving the minutes the same motion as
+  the hour flattened that hierarchy and made the face kinetic every minute.
+- **Per-row slide direction.** Moot once only the hour slides.
 - **Auto day/night.** White-on-black after sunset, black-on-white by day. The
   idea is clean, but it adds a rule and a failure mode to a face whose theme is
   already one deliberate choice.
@@ -47,19 +50,17 @@ supplies a string, not a layout. When it lands, the `Date` setting becomes
 
 ## Motion
 
-- **Per-row slide direction.** Hour slides down as minutes slide up. Nobody in
-  no face in this family has done it; roughly 10 lines.
-- **Differential sliding.** Done, in the form the data allows: a row travels
-  only as far as its own text, so "four" -> "five" is 76px each way instead of
-  clearing the screen twice, and a blank row enters from just past where it
-  lands. Letter-level pinning of the shared prefix was the original idea and was
-  dropped: `words.c` puts the tens and the ones on separate rows, so "seventy" ->
-  "seventy one" already leaves the tens row untouched, and across the whole
-  English set only about six of the 132 hourly transitions share a leading
-  character at all. The measured effect was nothing; the travel is what was felt.
+- **Differential sliding.** Done, in the form the data allows: the hour travels
+  only as far as its own text, so "four" -> "five" is 76px rather than clearing
+  the screen. Letter-level pinning of the shared prefix was the original idea and
+  was dropped: `words.c` puts the tens and the ones on separate rows, so
+  "seventy" -> "seventy one" already leaves the tens row untouched, and across
+  the whole English set only about six of the 132 hourly transitions share a
+  leading character at all. The measured effect was nothing; the travel is what
+  was felt.
 - **Tunable duration / easing.** Current speed is `abs(x)/3 + 1` at 40ms per
-  frame. Rows move together; the old 6/3/0 stagger was removed in favour of
-  the hour-only slide.
+  frame. The hour moves on its own; the old 6/3/0 stagger was removed in favour
+  of the hour-only slide.
 - **Entrance animation on wake.** Currently only on launch.
 
 ## Platform

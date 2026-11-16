@@ -61,10 +61,10 @@ is at
 | Single-digit minutes | `seven oh five` or `seven five` |
 | Font weight | light or regular |
 | Letter case | lowercase or UPPERCASE |
-| Transition | none, every row, or the hour only |
+| Transition | none, or the hour only |
 
-Only the hour slides by default: it is the one change anyone notices. The
-minute rows change where they stand.
+The hour slides: it is the one change anyone notices. The minute rows cut
+instantly; `No animation` cuts the hour too.
 
 ## Notes
 

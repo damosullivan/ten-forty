@@ -93,7 +93,7 @@ typedef struct {
   uint8_t oh;         /* 1 = "oh five", 0 = "five" */
   uint8_t regular;    /* 0 = Iosevka Light, 1 = Iosevka Regular */
   uint8_t caps;       /* 0 lower, 1 UPPER */
-  uint8_t trans;      /* 0 none, 1 slide every row, 2 slide the hour only */
+  uint8_t trans;      /* 0 none, 1 slide the hour only */
   char date_text[20];
 } App;
 
@@ -385,12 +385,11 @@ static void refresh_time(const struct tm *t, bool animate) {
   hour_to_12h_word(t->tm_hour, hour);
   minute_to_words(t->tm_min, app->oh, tens, ones);
 
-  const bool slide_all = animate && (app->trans == 1);
   const bool slide_hour = animate && (app->trans != 0);
 
   row_set_text(&app->rows[0], to_case(hour), slide_hour);
-  row_set_text(&app->rows[1], to_case(tens), slide_all);
-  row_set_text(&app->rows[2], to_case(ones), slide_all);
+  row_set_text(&app->rows[1], to_case(tens), false);
+  row_set_text(&app->rows[2], to_case(ones), false);
 
   app->last_hour = t->tm_hour;
   app->last_minute = t->tm_min;
@@ -490,7 +489,7 @@ static void inbox_received(DictionaryIterator *it, void *context) {
     dirty = true;
   }
   if ((t = dict_find(it, MESSAGE_KEY_Transition))) {
-    app->trans = (uint8_t)t->value->int32;
+    app->trans = t->value->int32 ? 1 : 0;
     persist_write_int(9, app->trans);
     dirty = true;
   }
@@ -585,7 +584,7 @@ static void init(void) {
   app->oh         = persist_exists(5) ? persist_read_int(5) : 1;
   app->regular    = persist_exists(7) ? persist_read_int(7) : 0;
   app->caps       = (persist_exists(8) && persist_read_int(8) == 1) ? 1 : 0;
-  app->trans      = persist_exists(9) ? persist_read_int(9) : 2;
+  app->trans      = persist_exists(9) ? (persist_read_int(9) ? 1 : 0) : 1;
 
   app->last_hour = -1;
   app->last_minute = -1;

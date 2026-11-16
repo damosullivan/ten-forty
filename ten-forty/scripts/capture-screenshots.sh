@@ -65,7 +65,7 @@ settings() { # platform theme align
 import json, sys
 m = json.load(open(sys.argv[3]))
 v = {"Theme": int(sys.argv[1]), "Align": int(sys.argv[2]), "Date": 1,
-     "OhWords": 1, "Weight": 0, "Case": 0, "Transition": 2}
+     "OhWords": 1, "Weight": 0, "Case": 0, "Transition": 1}
 print(" ".join("%d=%d" % (m[k], v[k]) for k in v))
 PY
 )

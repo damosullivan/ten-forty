@@ -9,12 +9,12 @@
  * URL fragment so the page opens on the watch's real values.
  */
 
-var CONFIG_URL = 'https://damosullivan.github.io/ten-forty/config.html?v=1.1.0';
+var CONFIG_URL = 'https://damosullivan.github.io/ten-forty/config.html?v=1.1.1';
 
 /* Mirrors DEFAULT_OPTS in scripts/config-page.js. The watch always sends all
  * seven keys, so this only matters before it has said anything. If you add a
  * setting, change both. */
-var DEFAULT_OPTS = { Theme: 0, Align: 0, Date: 1, OhWords: 1, Weight: 0, Case: 0, Transition: 2 };
+var DEFAULT_OPTS = { Theme: 0, Align: 0, Date: 1, OhWords: 1, Weight: 0, Case: 0, Transition: 1 };
 
 function loadOpts() {
   try {

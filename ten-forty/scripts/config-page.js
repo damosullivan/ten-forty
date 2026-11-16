@@ -26,7 +26,7 @@ var OUT = path.join(__dirname, '..', '..', 'docs', 'config.html');
 /* Mirrors DEFAULT_OPTS in src/pkjs/index.js. The watch always sends all seven
  * keys, so this only matters for the page opened directly by hand. If you add
  * a setting, change both. */
-var DEFAULT_OPTS = { Theme: 0, Align: 0, Date: 1, OhWords: 1, Weight: 0, Case: 0, Transition: 2 };
+var DEFAULT_OPTS = { Theme: 0, Align: 0, Date: 1, OhWords: 1, Weight: 0, Case: 0, Transition: 1 };
 
 var KEYS = ["Theme", "Align", "Date", "OhWords", "Weight", "Case", "Transition"];
 
@@ -50,7 +50,7 @@ function buildConfigHtml() {
     ['OhWords', 'Single-digit minutes', [['1', 'Seven oh five'], ['0', 'Seven five']]],
     ['Weight', 'Font weight', [['0', 'Light'], ['1', 'Regular']]],
     ['Case', 'Letter case', [['0', 'lowercase'], ['1', 'UPPERCASE']]],
-    ['Transition', 'Transition', [['2', 'Slide the hour only'], ['1', 'Slide every row'], ['0', 'No animation']]]
+    ['Transition', 'Transition', [['1', 'Slide the hour only'], ['0', 'No animation']]]
   ];
 
   var body = '';
