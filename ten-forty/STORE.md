@@ -30,7 +30,7 @@ Round 2.
 | Category | Not required for watchfaces; filed under *Faces* |
 | Version | `1.1.2` |
 | Release notes | Move the settings page to the new repository path. |
-| Source code URL | https://github.com/damosullivan/ten-forty |
+| Source code URL | https://github.com/damosullivan/pebble/tree/main/ten-forty |
 | Website URL | Optional |
 | Visibility | Unlisted for the first submission, then Listed |
 
